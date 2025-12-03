@@ -1,6 +1,7 @@
 "use client"
 
 import { ChevronDown, Zap, Globe, Heart } from "lucide-react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
@@ -17,7 +18,7 @@ const categories = [
 
 export default function Navigation() {
   return (
-    <nav className="bg-white border-b border-gray-200">
+    <nav className="bg-white border-b border-gray-200 sticky top-[calc(var(--header-height)-30px)] z-40 shadow-sm">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center gap-6 py-2">
           <DropdownMenu>
@@ -34,24 +35,38 @@ export default function Navigation() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="flex items-center gap-1 text-sm">
+          <Link href="/flash-sales" className="flex items-center gap-1 text-sm">
             <Zap className="w-4 h-4 text-yellow-500" />
             <span>Flash Sales</span>
-          </div>
+          </Link>
 
-          <div className="flex items-center gap-1 text-sm">
+          <Link href="/global" className="flex items-center gap-1 text-sm">
             <Globe className="w-4 h-4" />
             <span>Global</span>
-          </div>
+          </Link>
 
-          <div className="flex items-center gap-1 text-sm">
+          <Link href="/healthcare-center" className="flex items-center gap-1 text-sm">
             <Heart className="w-4 h-4 text-red-500" />
             <span>Healthcare Center</span>
-          </div>
+          </Link>
 
-          <div className="ml-auto flex items-center gap-2 text-sm">
-            <span className="text-gray-600">E-Services</span>
-            <ChevronDown className="w-4 h-4" />
+          <div className="ml-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="gap-2 bg-transparent text-foreground">
+                  E-Services
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem asChild>
+                  <Link href="/healthcare-center">Health Center</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/e-services/consult-a-gp">Consult a GP</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
