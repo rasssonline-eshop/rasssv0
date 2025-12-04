@@ -5,6 +5,18 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Star, ShoppingCart } from "lucide-react"
 import { useParams } from "next/navigation"
+import Image from "next/image"
+
+const categoryImages: Record<string, string> = {
+  Fragrances: "https://picsum.photos/seed/fragrances/600/600",
+  Makeup: "https://picsum.photos/seed/makeup/600/600",
+  "Baby Care & Diapers": "https://picsum.photos/seed/baby-diapers/600/600",
+  Vitamins: "https://picsum.photos/seed/vitamins/600/600",
+  "Skin Care": "https://picsum.photos/seed/skincare/600/600",
+  "Baby Accessories": "https://picsum.photos/seed/baby-accessories/600/600",
+  "Hair Care": "https://picsum.photos/seed/haircare/600/600",
+  "Personal Care": "https://picsum.photos/seed/personal-care/600/600",
+}
 
 export default function CategoryPage() {
   const params = useParams<{ name: string }>()!
@@ -22,7 +34,7 @@ export default function CategoryPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="container">
         <h1 className="text-3xl font-bold mb-2">{name}</h1>
         <p className="text-gray-600 mb-8">Showing {products.length} products</p>
 
@@ -30,8 +42,14 @@ export default function CategoryPage() {
           {products.map((product) => (
             <Link key={product.id} href={`/product/${product.slug}`}>
               <Card className="overflow-hidden hover:shadow-lg transition">
-                <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-                  <span className="text-6xl">📦</span>
+                <div className="relative aspect-square overflow-hidden">
+                  <Image
+                    src={categoryImages[name] || categoryImages["Skin Care"]}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width:768px) 100vw, 25vw"
+                  />
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-sm line-clamp-2 mb-2">{product.name}</h3>

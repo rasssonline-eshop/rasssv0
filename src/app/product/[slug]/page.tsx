@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import * as React from "react"
 import { useParams } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -26,7 +27,7 @@ const sampleCatalog: Record<string, Product> = {
     oldPrice: 209.31,
     rating: 4.6,
     tags: ["Hyperpigmentation & Dark Spots", "Skin Brightening", "Skin Care"],
-    image: "/placeholder.jpg",
+    image: "https://images.unsplash.com/photo-1585386959984-a41552231617?auto=format&fit=crop&w=800&q=60",
   },
 }
 
@@ -40,7 +41,7 @@ function getProduct(slug: string): Product {
       oldPrice: undefined,
       rating: 4.3,
       tags: ["Skin Care"],
-      image: "/placeholder.jpg",
+      image: "https://picsum.photos/seed/product-1/800/800",
     }
   )
 }
@@ -48,14 +49,22 @@ function getProduct(slug: string): Product {
 export default function ProductDetailPage() {
   const params = useParams<{ slug: string }>()!
   const product = getProduct(params.slug)
+  const images = [
+    product.image,
+    "https://picsum.photos/seed/product-2/800/800",
+    "https://picsum.photos/seed/product-3/800/800",
+    "https://picsum.photos/seed/product-4/800/800",
+    "https://picsum.photos/seed/product-5/800/800",
+  ]
+  const [active, setActive] = React.useState(0)
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="container py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <div className="relative w-full aspect-square bg-white">
             <Image
-              src={product.image}
+              src={images[active]}
               alt={product.name}
               fill
               className="object-contain"
@@ -63,14 +72,11 @@ export default function ProductDetailPage() {
             />
           </div>
           <div className="mt-4 grid grid-cols-5 gap-2">
-            {Array(5)
-              .fill(0)
-              .map((_, i) => (
-                <div
-                  key={i}
-                  className="aspect-square rounded-md bg-gray-100 border border-gray-200"
-                />
-              ))}
+            {images.map((src, i) => (
+              <button key={i} onClick={() => setActive(i)} className="relative aspect-square rounded-md overflow-hidden border border-gray-200">
+                <Image src={src} alt={product.name} fill className="object-cover" sizes="100px" />
+              </button>
+            ))}
           </div>
         </div>
 

@@ -3,22 +3,26 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
+import Image from "next/image"
 
 const slides = [
   {
     id: 1,
     title: "Beauty & Wellness",
     subtitle: "Exclusive deals across health, beauty and baby care",
+    image: "https://picsum.photos/seed/beauty/1200/600",
   },
   {
     id: 2,
     title: "Great Prices",
     subtitle: "Exclusive online deals every day",
+    image: "https://picsum.photos/seed/skincare/1200/600",
   },
   {
     id: 3,
     title: "Same-Day Delivery",
     subtitle: "Available in major cities",
+    image: "https://picsum.photos/seed/wellness/1200/600",
   },
 ]
 
@@ -30,14 +34,22 @@ export default function Hero() {
 
   return (
     <section className="bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="relative bg-gradient-to-r from-primary to-accent rounded-lg overflow-hidden h-80">
+      <div className="container">
+        <div className="relative rounded-lg overflow-hidden h-80">
+          <Image
+            src={slides[current].image}
+            alt={slides[current].title}
+            fill
+            className="object-cover"
+            sizes="(max-width:768px) 100vw, 1200px"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/60 to-accent/60" />
           <div className="absolute inset-0 flex items-center justify-between px-8 z-10">
             <Button size="icon" variant="ghost" onClick={prev} className="bg-white/70 hover:bg-white">
               <ChevronLeft className="w-6 h-6" />
             </Button>
 
-            <div className="text-center text-primary-foreground">
+            <div className="text-center text-white">
               <h2 className="text-4xl font-bold mb-2">{slides[current].title}</h2>
               <p className="text-lg">{slides[current].subtitle}</p>
             </div>

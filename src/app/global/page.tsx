@@ -6,7 +6,7 @@ import { ShieldCheck, Globe } from "lucide-react"
 
 export default function GlobalPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="container py-8">
       <div className="mb-6">
         <div className="flex items-center gap-2">
           <Globe className="w-5 h-5 text-primary" />

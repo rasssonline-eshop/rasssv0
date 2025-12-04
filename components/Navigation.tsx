@@ -19,7 +19,7 @@ const categories = [
 export default function Navigation() {
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-[calc(var(--header-height)-30px)] z-40 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="px-4">
         <div className="flex items-center gap-6 py-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 export default function Footer() {
   return (
     <footer className="bg-[#2c6ba4] text-white">
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
             <h4 className="font-bold text-lg mb-4">Rasss Online</h4>
@@ -116,7 +116,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-700 pt-8">
+        <div className="border-t border-white/20 pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-gray-400">
             <div>
               <h5 className="font-bold text-white mb-3">Quick Links</h5>
@@ -138,7 +138,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-400">
+        <div className="border-t border-white/20 mt-8 pt-8 text-center text-sm text-gray-200">
           <p>&copy; 2025 Rasss. All rights reserved.</p>
         </div>
       </div>

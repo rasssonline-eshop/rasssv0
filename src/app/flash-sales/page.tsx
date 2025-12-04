@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Star, Timer } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 const deals = Array(12)
   .fill(null)
@@ -15,11 +16,17 @@ const deals = Array(12)
     price: Math.floor(Math.random() * 200) + 20,
     oldPrice: Math.floor(Math.random() * 250) + 50,
     rating: (Math.random() * 2 + 3).toFixed(1),
+    image: [
+      "https://picsum.photos/seed/deal-1/600/400",
+      "https://picsum.photos/seed/deal-2/600/400",
+      "https://picsum.photos/seed/deal-3/600/400",
+      "https://picsum.photos/seed/deal-4/600/400",
+    ][i % 4],
   }))
 
 export default function FlashSalesPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="container py-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Flash Sales</h1>
         <div className="flex items-center gap-2 text-sm">
@@ -32,8 +39,8 @@ export default function FlashSalesPage() {
         {deals.map((d) => (
           <Link key={d.id} href={`/product/${d.slug}`}>
             <Card className="overflow-hidden hover:shadow-lg transition cursor-pointer">
-              <div className="w-full h-48 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                <span className="text-4xl">⚡</span>
+              <div className="relative w-full h-48">
+                <Image src={d.image} alt={d.name} fill className="object-cover" sizes="(max-width:768px) 100vw, 25vw" />
               </div>
               <div className="p-4 space-y-2">
                 <div className="flex items-center gap-2">

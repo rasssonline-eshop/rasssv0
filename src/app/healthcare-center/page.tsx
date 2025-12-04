@@ -6,7 +6,7 @@ import { Phone, Stethoscope, ShieldCheck } from "lucide-react"
 
 export default function HealthcareCenterPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="container py-8">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Stethoscope className="w-5 h-5 text-primary" />

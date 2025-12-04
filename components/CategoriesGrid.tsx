@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
+import Image from "next/image"
 
 const categories = [
   {
@@ -38,17 +39,34 @@ const categories = [
   },
 ]
 
+const categoryImages: Record<string, string> = {
+  Fragrances: "https://picsum.photos/seed/fragrances/600/400",
+  Makeup: "https://picsum.photos/seed/makeup/600/400",
+  "Baby Care & Diapers": "https://picsum.photos/seed/baby-diapers/600/400",
+  Vitamins: "https://picsum.photos/seed/vitamins/600/400",
+  "Skin Care": "https://picsum.photos/seed/skincare/600/400",
+  "Baby Accessories": "https://picsum.photos/seed/baby-accessories/600/400",
+  "Hair Care": "https://picsum.photos/seed/haircare/600/400",
+  "Personal Care": "https://picsum.photos/seed/personal-care/600/400",
+}
+
 export default function CategoriesGrid() {
   return (
     <section className="py-12 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="container">
         <h2 className="text-2xl font-bold mb-8">Categories</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((category) => (
             <Link key={category.name} href={`/category/${category.name}`}>
               <Card className="overflow-hidden hover:shadow-lg transition cursor-pointer h-full">
-                <div className="w-full h-48 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                  <span className="text-4xl">📦</span>
+                <div className="relative w-full h-48">
+                  <Image
+                    src={categoryImages[category.name] || categoryImages["Skin Care"]}
+                    alt={category.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width:768px) 100vw, 25vw"
+                  />
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold text-lg mb-2">{category.name}</h3>
