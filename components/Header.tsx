@@ -23,7 +23,7 @@ export default function Header() {
       <div className="px-4 py-2">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <Image src="/Rasss-logo1.png" alt="Rasss" width={96} height={26} className="opacity-95 drop-shadow-[0_0_12px_rgba(0,0,0,0.45)]" />
+            <Image src="/Rasss-logo1.png" alt="Rasss" width={96} height={26} className="opacity-95 drop-shadow-[0_0_16px_rgba(0,0,0,0.65)]" />
             <Badge variant="secondary" className="hidden md:inline-flex bg-white/10 text-white border-white/20">
               <Timer className="w-3 h-3" /> 2h Express Lahore
             </Badge>
