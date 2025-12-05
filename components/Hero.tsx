@@ -9,7 +9,7 @@ const slides = [
   {
     id: 1,
     title: "Beauty & Wellness",
-    subtitle: "Exclusive deals across health, beauty and baby care",
+    subtitle: "Made for Pakistan · Lahore delivery",
     image: "https://picsum.photos/seed/beauty/1200/600",
   },
   {
@@ -21,7 +21,7 @@ const slides = [
   {
     id: 3,
     title: "Same-Day Delivery",
-    subtitle: "Available in major cities",
+    subtitle: "Available in Lahore",
     image: "https://picsum.photos/seed/wellness/1200/600",
   },
 ]

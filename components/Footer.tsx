@@ -139,7 +139,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/20 mt-8 pt-8 text-center text-sm text-gray-200">
-          <p>&copy; 2025 Rasss. All rights reserved.</p>
+          <p>&copy; 2025 Rasss Pakistan · Lahore</p>
         </div>
       </div>
     </footer>

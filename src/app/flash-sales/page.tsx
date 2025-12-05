@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Star, Timer } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { formatPKR } from "@/lib/utils"
 
 const deals = Array(12)
   .fill(null)
@@ -31,7 +32,7 @@ export default function FlashSalesPage() {
         <h1 className="text-2xl font-bold">Flash Sales</h1>
         <div className="flex items-center gap-2 text-sm">
           <Timer className="w-4 h-4" />
-          <span>Ends soon</span>
+          <span>Ends soon in Lahore</span>
         </div>
       </div>
 
@@ -53,8 +54,8 @@ export default function FlashSalesPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-baseline gap-2">
-                    <span className="font-bold text-lg text-primary">SAR {d.price}</span>
-                    <span className="text-gray-500 line-through text-sm">SAR {d.oldPrice}</span>
+                    <span className="font-bold text-lg text-primary">{formatPKR(d.price)}</span>
+                    <span className="text-gray-500 line-through text-sm">{formatPKR(d.oldPrice)}</span>
                   </div>
                   <Button size="sm" className="bg-primary text-primary-foreground">Add</Button>
                 </div>

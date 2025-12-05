@@ -25,13 +25,13 @@ export default function Header() {
           <div className="flex items-center gap-2">
             <Image src="/Rasss-logo1.png" alt="Rasss" width={96} height={26} className="brightness-75 contrast-110" />
             <Badge variant="secondary" className="hidden md:inline-flex bg-white/10 text-white border-white/20">
-              <Timer className="w-3 h-3" /> 2h Express
+              <Timer className="w-3 h-3" /> 2h Express Lahore
             </Badge>
           </div>
           <div className="hidden lg:flex items-center gap-2 ml-4 text-sm">
             <MapPin className="w-4 h-4 text-white" />
             <span>Deliver to</span>
-            <span className="font-medium">Riyadh</span>
+            <span className="font-medium">Lahore</span>
           </div>
           <div className="flex-1">
             <Input
@@ -42,7 +42,7 @@ export default function Header() {
           <div className="flex items-center gap-2 ml-auto">
             <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/10">
               <Globe className="w-4 h-4" />
-              EN
+              EN | اردو
             </Button>
             <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/10">
               <User className="w-4 h-4" />

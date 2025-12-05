@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Star, ShoppingCart } from "lucide-react"
 import { useParams } from "next/navigation"
 import Image from "next/image"
+import { formatPKR } from "@/lib/utils"
 
 const categoryImages: Record<string, string> = {
   Fragrances: "https://picsum.photos/seed/fragrances/600/600",
@@ -58,7 +59,7 @@ export default function CategoryPage() {
                     <span className="text-sm text-gray-600">{product.rating}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-lg text-primary">SAR {product.price}</span>
+                    <span className="font-bold text-lg text-primary">{formatPKR(product.price)}</span>
                     <Button size="icon" className="bg-primary hover:bg-primary/90">
                       <ShoppingCart className="w-4 h-4" />
                     </Button>

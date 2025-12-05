@@ -5,7 +5,8 @@ import * as React from "react"
 import { useParams } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Star, Phone, ShieldCheck, Thermometer, CreditCard } from "lucide-react"
+import { Star, Phone, ShieldCheck, Thermometer, CreditCard, Truck } from "lucide-react"
+import { formatPKR } from "@/lib/utils"
 
 type Product = {
   slug: string
@@ -99,9 +100,9 @@ export default function ProductDetailPage() {
           </div>
 
           <div className="flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-primary">SAR {product.price}</span>
+            <span className="text-3xl font-bold text-primary">{formatPKR(product.price)}</span>
             {product.oldPrice && (
-              <span className="text-gray-500 line-through">SAR {product.oldPrice}</span>
+              <span className="text-gray-500 line-through">{formatPKR(product.oldPrice)}</span>
             )}
             {product.oldPrice && (
               <Badge>Online Exclusive · Save {Math.round(100 - (product.price / product.oldPrice) * 100)}%</Badge>
@@ -140,6 +141,9 @@ export default function ProductDetailPage() {
             </div>
             <div className="rounded-lg border bg-white p-3 flex items-center gap-2">
               <CreditCard className="w-4 h-4" /> Secure Payment
+            </div>
+            <div className="rounded-lg border bg-white p-3 flex items-center gap-2">
+              <Truck className="w-4 h-4" /> Cash on Delivery (Lahore)
             </div>
           </div>
         </div>

@@ -12,7 +12,7 @@ export default function GlobalPage() {
           <Globe className="w-5 h-5 text-primary" />
           <h1 className="text-2xl font-bold">Rasss Global</h1>
         </div>
-        <p className="text-gray-600">International shipping, curated global brands and exclusive imports.</p>
+        <p className="text-gray-600">International shipping to Pakistan, curated global brands and exclusive imports.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
