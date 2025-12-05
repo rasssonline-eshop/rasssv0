@@ -33,9 +33,8 @@ export default function Hero() {
   const prev = () => setCurrent((current - 1 + slides.length) % slides.length)
 
   return (
-    <section className="bg-gray-50 py-8">
-      <div className="container">
-        <div className="relative rounded-lg overflow-hidden h-80">
+    <section className="bg-gray-50">
+      <div className="relative w-full overflow-hidden h-[48vh] md:h-[60vh] lg:h-[70vh]">
           <Image
             src={slides[current].image}
             alt={slides[current].title}
@@ -44,14 +43,14 @@ export default function Hero() {
             sizes="(max-width:768px) 100vw, 1200px"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/60 to-accent/60" />
-          <div className="absolute inset-0 flex items-center justify-between px-8 z-10">
+          <div className="absolute inset-0 flex items-center justify-between px-6 md:px-8 z-10">
             <Button size="icon" variant="ghost" onClick={prev} className="bg-white/70 hover:bg-white">
               <ChevronLeft className="w-6 h-6" />
             </Button>
 
             <div className="text-center text-white">
-              <h2 className="text-4xl font-bold mb-2">{slides[current].title}</h2>
-              <p className="text-lg">{slides[current].subtitle}</p>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2">{slides[current].title}</h2>
+              <p className="text-base md:text-xl lg:text-2xl">{slides[current].subtitle}</p>
             </div>
 
             <Button size="icon" variant="ghost" onClick={next} className="bg-white/70 hover:bg-white">
@@ -59,16 +58,15 @@ export default function Hero() {
             </Button>
           </div>
 
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
             {slides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrent(idx)}
-                className={`w-2 h-2 rounded-full transition ${idx === current ? "bg-white w-6" : "bg-white/60"}`}
+                className={`h-2 rounded-full transition ${idx === current ? "bg-white w-8" : "bg-white/60 w-2"}`}
               />
             ))}
           </div>
-        </div>
       </div>
     </section>
   )
