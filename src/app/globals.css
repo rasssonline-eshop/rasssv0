@@ -126,3 +126,8 @@
     @apply max-w-7xl mx-auto px-4;
   }
 }
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}

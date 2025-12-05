@@ -42,6 +42,8 @@ export default function FlashSalesPage() {
             <Card className="overflow-hidden hover:shadow-lg transition cursor-pointer">
               <div className="relative w-full h-48">
                 <Image src={d.image} alt={d.name} fill className="object-cover" sizes="(max-width:768px) 100vw, 25vw" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                <div className="absolute bottom-3 left-3 text-white font-semibold text-sm">Flash Deal</div>
               </div>
               <div className="p-4 space-y-2">
                 <div className="flex items-center gap-2">

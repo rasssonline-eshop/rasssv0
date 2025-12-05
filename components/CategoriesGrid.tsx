@@ -67,6 +67,10 @@ export default function CategoriesGrid() {
                     className="object-cover"
                     sizes="(max-width:768px) 100vw, 25vw"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  <div className="absolute bottom-3 left-3 text-white font-semibold text-sm">
+                    {category.name}
+                  </div>
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold text-lg mb-2">{category.name}</h3>

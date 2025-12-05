@@ -51,6 +51,10 @@ export default function CategoryPage() {
                     className="object-cover"
                     sizes="(max-width:768px) 100vw, 25vw"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  <div className="absolute bottom-3 left-3 text-white font-semibold text-sm">
+                    {name}
+                  </div>
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-sm line-clamp-2 mb-2">{product.name}</h3>

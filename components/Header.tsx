@@ -39,12 +39,18 @@ export default function Header() {
               className="w-full h-8 bg-white/10 text-white placeholder:text-white/60 border border-white/20"
             />
           </div>
-          <div className="flex items-center gap-2 ml-auto">
-            <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/10">
+          <div className="flex items-center gap-1 sm:gap-2 ml-auto">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 sm:hidden">
+              <Globe className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/10 hidden sm:flex">
               <Globe className="w-4 h-4" />
               EN | اردو
             </Button>
-            <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/10">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 sm:hidden">
+              <User className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-white/10 hidden sm:flex">
               <User className="w-4 h-4" />
               Login
             </Button>
