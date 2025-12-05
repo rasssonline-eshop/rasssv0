@@ -1,12 +1,15 @@
 "use client"
 
 import Image from "next/image"
+import Link from "next/link"
 import * as React from "react"
 import { useParams } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Star, Phone, ShieldCheck, Thermometer, CreditCard, Truck } from "lucide-react"
+import { Star, Phone, ShieldCheck, Thermometer, CreditCard, Truck, CheckCircle } from "lucide-react"
 import { formatPKR } from "@/lib/utils"
+import { useCart } from "@/components/CartProvider"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
 
 type Product = {
   slug: string
@@ -32,19 +35,36 @@ const sampleCatalog: Record<string, Product> = {
   },
 }
 
+function strHash(s: string) {
+  let h = 0
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0
+  return h >>> 0
+}
+
+function seededRng(seed: number) {
+  let a = seed || 1
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0
+    let t = Math.imul(a ^ (a >>> 15), a | 1)
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
 function getProduct(slug: string): Product {
-  return (
-    sampleCatalog[slug] || {
-      slug,
-      name: slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-      brand: "Rasss",
-      price: Math.floor(Math.random() * 200) + 20,
-      oldPrice: undefined,
-      rating: 4.3,
-      tags: ["Skin Care"],
-      image: "https://picsum.photos/seed/product-1/800/800",
-    }
-  )
+  if (sampleCatalog[slug]) return sampleCatalog[slug]
+  const rng = seededRng(strHash(slug))
+  const price = Math.floor(rng() * 180) + 20
+  return {
+    slug,
+    name: slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    brand: "Rasss",
+    price,
+    oldPrice: undefined,
+    rating: 4.3,
+    tags: ["Skin Care"],
+    image: "https://picsum.photos/seed/product-1/800/800",
+  }
 }
 
 export default function ProductDetailPage() {
@@ -58,9 +78,25 @@ export default function ProductDetailPage() {
     "https://picsum.photos/seed/product-5/800/800",
   ]
   const [active, setActive] = React.useState(0)
+  const { addItem, setOpen } = useCart()
 
   return (
     <div className="container py-8">
+      <Breadcrumb className="mb-4">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href={`/category/${(product.tags?.[0] || 'Skin Care')}`}>{product.tags?.[0] || 'Skin Care'}</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{product.name}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <div className="relative w-full aspect-square bg-white">
@@ -109,26 +145,44 @@ export default function ProductDetailPage() {
             )}
           </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="rounded-lg border bg-white p-3 flex items-center gap-2">
+              <Truck className="w-4 h-4 text-primary" /> Same-day delivery in Lahore
+            </div>
+            <div className="rounded-lg border bg-white p-3 flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-primary" /> Cash on Delivery available
+            </div>
+            <div className="rounded-lg border bg-white p-3 flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-primary" /> In Stock
+            </div>
+          </div>
+
           <div className="rounded-lg border border-gray-200 bg-white">
             <details className="p-4">
-              <summary className="cursor-pointer font-medium">Product Details</summary>
-              <div className="mt-3 space-y-2 text-sm text-gray-700">
-                <div>
-                  <span className="text-gray-600">Brand:</span> {product.brand}
-                </div>
-                <div>
-                  <span className="text-gray-600">Product Type:</span> Cream
-                </div>
-                <div>
-                  <span className="text-gray-600">Concern:</span> Dark Spots, Acne
-                </div>
+              <summary className="cursor-pointer font-medium">Highlights</summary>
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700">
+                {(product.tags || ["Skin Care"]).map((t, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-primary" /> {t}
+                  </div>
+                ))}
+                <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /> Genuine brands</div>
+                <div className="flex items-center gap-2"><Thermometer className="w-4 h-4 text-primary" /> Temperature Controlled</div>
               </div>
             </details>
           </div>
         </div>
 
         <div className="space-y-4">
-          <Button className="w-full h-12 bg-primary text-primary-foreground">Add To Cart</Button>
+          <Button
+            className="w-full h-12 bg-primary text-primary-foreground"
+            onClick={() => {
+              addItem({ id: product.slug, slug: product.slug, name: product.name, price: product.price, image: product.image }, 1)
+              setOpen(true)
+            }}
+          >
+            Add To Cart
+          </Button>
           <Button variant="outline" className="w-full h-12 flex gap-2">
             <Phone className="w-4 h-4" /> Call our Pharmacist
           </Button>
@@ -146,6 +200,22 @@ export default function ProductDetailPage() {
               <Truck className="w-4 h-4" /> Cash on Delivery (Lahore)
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="mt-10">
+        <h2 className="text-xl font-bold mb-4">Related Products</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[1,2,3,4].map((i) => (
+            <Link key={i} href={`/product/sample-related-${i}`} className="block">
+              <div className="rounded-lg border bg-white overflow-hidden hover:shadow-sm">
+                <div className="relative w-full aspect-square">
+                  <Image src={`https://picsum.photos/seed/related-${i}/600/600`} alt="Related" fill className="object-cover" sizes="(max-width:768px) 100vw, 25vw" />
+                </div>
+                <div className="p-3 text-sm">Related Item {i}</div>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </div>

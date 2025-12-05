@@ -6,9 +6,11 @@ import Image from "next/image"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { useEffect, useRef } from "react"
+import { useCart } from "@/components/CartProvider"
 
 export default function Header() {
   const ref = useRef<HTMLElement | null>(null)
+  const { count, setOpen } = useCart()
   useEffect(() => {
     const update = () => {
       const h = ref.current?.offsetHeight ?? 0
@@ -57,8 +59,11 @@ export default function Header() {
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
               <Heart className="w-5 h-5" />
             </Button>
-            <Button size="sm" className="bg-primary text-primary-foreground">
+            <Button size="sm" className="relative bg-primary text-primary-foreground" onClick={() => setOpen(true)}>
               <ShoppingCart className="w-4 h-4" />
+              {count > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full px-1">{count}</span>
+              )}
             </Button>
           </div>
         </div>

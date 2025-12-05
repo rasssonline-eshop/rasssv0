@@ -7,15 +7,33 @@ import { Star, ShoppingCart } from "lucide-react"
 
 export default function CategoryPage() {
   const { name } = useParams()
+  function strHash(s: string) {
+    let h = 0
+    for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0
+    return h >>> 0
+  }
+
+  function seededRng(seed: number) {
+    let a = seed || 1
+    return () => {
+      a = (a + 0x6D2B79F5) >>> 0
+      let t = Math.imul(a ^ (a >>> 15), a | 1)
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+    }
+  }
+
+  const baseName = typeof name === 'string' ? name : String(name ?? '')
+  const rngBase = seededRng(strHash(baseName))
 
   const products = Array(12)
     .fill(null)
     .map((_, i) => ({
       id: i,
-      name: `${name} Product ${i + 1}`,
-      price: Math.floor(Math.random() * 200) + 20,
-      rating: (Math.random() * 2 + 3).toFixed(1),
-      image: `/placeholder.svg?height=300&width=300&query=${name}-product-${i}`,
+      name: `${baseName} Product ${i + 1}`,
+      price: Math.floor((rngBase() + i * 0.01) * 200) + 20,
+      rating: (3 + ((rngBase() + i * 0.03) % 1) * 2).toFixed(1),
+      image: `/placeholder.svg?height=300&width=300&query=${baseName}-product-${i}`,
     }))
 
   return (

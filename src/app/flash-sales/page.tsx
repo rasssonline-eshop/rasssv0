@@ -7,25 +7,43 @@ import { Star, Timer } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { formatPKR } from "@/lib/utils"
+import { useCart } from "@/components/CartProvider"
+
+function seededRng(seed: number) {
+  let a = seed || 1
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0
+    let t = Math.imul(a ^ (a >>> 15), a | 1)
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
 
 const deals = Array(12)
   .fill(null)
-  .map((_, i) => ({
-    id: i,
-    name: `Flash Deal ${i + 1}`,
-    slug: `flash-deal-${i + 1}`,
-    price: Math.floor(Math.random() * 200) + 20,
-    oldPrice: Math.floor(Math.random() * 250) + 50,
-    rating: (Math.random() * 2 + 3).toFixed(1),
-    image: [
-      "https://picsum.photos/seed/deal-1/600/400",
-      "https://picsum.photos/seed/deal-2/600/400",
-      "https://picsum.photos/seed/deal-3/600/400",
-      "https://picsum.photos/seed/deal-4/600/400",
-    ][i % 4],
-  }))
+  .map((_, i) => {
+    const rng = seededRng(i + 1)
+    const price = Math.floor(rng() * 180) + 20
+    const oldPrice = Math.floor(rng() * 200) + 70
+    const rating = (3 + rng() * 2).toFixed(1)
+    return {
+      id: i,
+      name: `Flash Deal ${i + 1}`,
+      slug: `flash-deal-${i + 1}`,
+      price,
+      oldPrice,
+      rating,
+      image: [
+        "https://picsum.photos/seed/deal-1/600/400",
+        "https://picsum.photos/seed/deal-2/600/400",
+        "https://picsum.photos/seed/deal-3/600/400",
+        "https://picsum.photos/seed/deal-4/600/400",
+      ][i % 4],
+    }
+  })
 
 export default function FlashSalesPage() {
+  const { addItem } = useCart()
   return (
     <div className="container py-8">
       <div className="flex items-center justify-between mb-6">
@@ -59,7 +77,16 @@ export default function FlashSalesPage() {
                     <span className="font-bold text-lg text-primary">{formatPKR(d.price)}</span>
                     <span className="text-gray-500 line-through text-sm">{formatPKR(d.oldPrice)}</span>
                   </div>
-                  <Button size="sm" className="bg-primary text-primary-foreground">Add</Button>
+                  <Button
+                    size="sm"
+                    className="bg-primary text-primary-foreground"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      addItem({ id: d.slug, slug: d.slug, name: d.name, price: d.price, image: d.image }, 1)
+                    }}
+                  >
+                    Add
+                  </Button>
                 </div>
               </div>
             </Card>

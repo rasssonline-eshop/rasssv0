@@ -52,7 +52,7 @@ const categoryImages: Record<string, string> = {
 
 export default function CategoriesGrid() {
   return (
-    <section className="py-12 bg-gray-50">
+    <section id="categories" className="py-12 bg-gray-50">
       <div className="container">
         <h2 className="text-2xl font-bold mb-8">Categories</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
