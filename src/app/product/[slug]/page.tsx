@@ -135,14 +135,8 @@ export default function ProductDetailPage() {
               sizes="(max-width: 768px) 100vw, 33vw"
             />
             {isComingSoon && (
-              <div className="absolute top-3 right-3">
-                <Image
-                  src="https://img.freepik.com/free-vector/coming-soon-neon-sign_23-2147857976.jpg"
-                  alt="Coming Soon"
-                  width={64}
-                  height={64}
-                  className="rounded-md border border-gray-200 shadow object-cover"
-                />
+              <div className="absolute top-3 left-3">
+                <Badge variant="secondary">Coming Soon</Badge>
               </div>
             )}
           </div>

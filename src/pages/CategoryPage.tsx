@@ -3,6 +3,7 @@
 import { useParams } from "react-router-dom"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Star, ShoppingCart } from "lucide-react"
 
 export default function CategoryPage() {
@@ -78,11 +79,9 @@ export default function CategoryPage() {
                   className="w-full h-full object-cover hover:scale-105 transition"
                 />
                 {isComingSoon && (
-                  <img
-                    src="https://img.freepik.com/free-vector/coming-soon-neon-sign_23-2147857976.jpg"
-                    alt="Coming Soon"
-                    className="absolute top-3 right-3 w-16 h-16 object-cover rounded-md border border-white/40 shadow"
-                  />
+                  <div className="absolute top-3 left-3">
+                    <Badge variant="secondary">Coming Soon</Badge>
+                  </div>
                 )}
               </div>
               <div className="p-4">

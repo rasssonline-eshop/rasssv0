@@ -80,26 +80,63 @@ const categories = [
 ]
 
 export default function CategoriesGrid() {
+  const imageMap: Record<string, string> = {
+    Fragrances: "/fragrances.jpg",
+    Makeup: "/makeup-products.png",
+    "Baby Care & Diapers": "/baby-care.jpg",
+    Vitamins: "/assorted-vitamins.png",
+    "Skin Care": "/skincare.jpg",
+    "Baby Accessories": "/baby-accessories.jpg",
+    "Hair Care": "/hair-care.jpg",
+    "Personal Care": "/personal-care.jpg",
+    "Infant Milk Powder": "/baby-care.jpg",
+    Cereals: "/personal-care.jpg",
+    Balm: "/personal-care.jpg",
+    "Heat spray (Pain killer)": "/personal-care.jpg",
+    "Heat lotion (Pain Killer)": "/personal-care.jpg",
+    "Heat cream (Pain Killer)": "/personal-care.jpg",
+    "Hair removing spray": "/hair-care.jpg",
+    "Acne cream": "/skincare.jpg",
+    "Acne scar cream": "/skincare.jpg",
+    "Acne serum": "/skincare.jpg",
+    "Acne face wash": "/skincare.jpg",
+    "Acne soap": "/skincare.jpg",
+    "Skin beauty cream": "/skincare.jpg",
+    "Skin moisturizer lotion": "/skincare.jpg",
+    "Moisturizer soap": "/skincare.jpg",
+    "Whitening serum": "/skincare.jpg",
+    "Whitening cream": "/skincare.jpg",
+    "Whitening face wash": "/skincare.jpg",
+    "Whitening soap": "/skincare.jpg",
+    "Sun block lotion spf 60": "/skincare.jpg",
+    "Sun block lotion spf 100": "/skincare.jpg",
+    "Scabies lotion": "/personal-care.jpg",
+    "Scabies soap": "/personal-care.jpg",
+    "Charcoal face wash": "/skincare.jpg",
+    "Facial products": "/skincare.jpg",
+    "Hair serum": "/hair-care.jpg",
+    "Hair oil": "/hair-care.jpg",
+    "Hair shampoo": "/hair-care.jpg",
+    "Hair shampoo plus conditioner": "/hair-care.jpg",
+    "Slimming Tea": "/personal-care.jpg",
+  }
+  const sorted = [...categories].sort((a, b) => Number(!!a.comingSoon) - Number(!!b.comingSoon))
   return (
     <section className="py-12 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
         <h2 className="text-2xl font-bold mb-8">Categories</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((category) => (
+          {sorted.map((category) => (
             <Link key={category.name} to={`/category/${category.name}`}>
               <Card className="overflow-hidden hover:shadow-md transition-transform hover:-translate-y-0.5 cursor-pointer h-full">
                 <img
-                  src={category.image || "/placeholder.svg"}
+                  src={imageMap[category.name] || category.image || "/placeholder.svg"}
                   alt={category.name}
                   className="w-full h-48 object-cover"
                 />
                 {category.comingSoon && (
-                  <div className="absolute top-3 right-3">
-                    <img
-                      src="https://ik.imagekit.io/vfhlzpxfu/assets/dummy/AR12%20%2825%29.jpg"
-                      alt="Coming Soon"
-                      className="w-12 h-12 object-contain rounded-md border border-white/40 shadow"
-                    />
+                  <div className="absolute top-3 left-3">
+                    <Badge variant="secondary">Coming Soon</Badge>
                   </div>
                 )}
                 <div className="p-4">

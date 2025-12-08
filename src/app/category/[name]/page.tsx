@@ -145,14 +145,8 @@ export default function CategoryPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                   {comingSoonCategories.has(name) && (
-                    <div className="absolute top-3 right-3">
-                      <Image
-                        src="https://img.freepik.com/free-vector/coming-soon-neon-sign_23-2147857976.jpg"
-                        alt="Coming Soon"
-                        width={64}
-                        height={64}
-                        className="rounded-md border border-white/40 shadow object-cover"
-                      />
+                    <div className="absolute top-3 left-3">
+                      <Badge variant="secondary">Coming Soon</Badge>
                     </div>
                   )}
                   <div className="absolute bottom-3 left-3 text-white font-semibold text-sm">

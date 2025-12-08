@@ -92,30 +92,55 @@ const categories = [
 ]
 
 const categoryImages: Record<string, string> = {
-  Fragrances: "https://picsum.photos/seed/fragrances/600/400",
-  Makeup: "https://picsum.photos/seed/makeup/600/400",
-  "Baby Care & Diapers": "https://picsum.photos/seed/baby-diapers/600/400",
-  Vitamins: "https://picsum.photos/seed/vitamins/600/400",
-  "Skin Care": "https://picsum.photos/seed/skincare/600/400",
-  "Baby Accessories": "https://picsum.photos/seed/baby-accessories/600/400",
-  "Hair Care": "https://picsum.photos/seed/haircare/600/400",
-  "Personal Care": "https://picsum.photos/seed/personal-care/600/400",
-  "Infant Milk Powder": "https://picsum.photos/seed/infant-milk/600/400",
-  Cereals: "https://picsum.photos/seed/cereals/600/400",
-  Balm: "https://picsum.photos/seed/balm/600/400",
-  "Heat spray (Pain killer)": "https://picsum.photos/seed/heat-spray/600/400",
-  "Heat lotion (Pain Killer)": "https://picsum.photos/seed/heat-lotion/600/400",
-  "Heat cream (Pain Killer)": "https://picsum.photos/seed/heat-cream/600/400",
-  "Hair removing spray": "https://picsum.photos/seed/hair-removing/600/400",
+  Fragrances: "/fragrances.jpg",
+  Makeup: "/makeup-products.png",
+  "Baby Care & Diapers": "/baby-care.jpg",
+  Vitamins: "/assorted-vitamins.png",
+  "Skin Care": "/skincare.jpg",
+  "Baby Accessories": "/baby-accessories.jpg",
+  "Hair Care": "/hair-care.jpg",
+  "Personal Care": "/personal-care.jpg",
+  "Infant Milk Powder": "/baby-care.jpg",
+  Cereals: "/personal-care.jpg",
+  Balm: "/personal-care.jpg",
+  "Heat spray (Pain killer)": "/personal-care.jpg",
+  "Heat lotion (Pain Killer)": "/personal-care.jpg",
+  "Heat cream (Pain Killer)": "/personal-care.jpg",
+  "Hair removing spray": "/hair-care.jpg",
+  // Coming soon categories mapped to relevant local images
+  "Acne cream": "/skincare.jpg",
+  "Acne scar cream": "/skincare.jpg",
+  "Acne serum": "/skincare.jpg",
+  "Acne face wash": "/skincare.jpg",
+  "Acne soap": "/skincare.jpg",
+  "Skin beauty cream": "/skincare.jpg",
+  "Skin moisturizer lotion": "/skincare.jpg",
+  "Moisturizer soap": "/skincare.jpg",
+  "Whitening serum": "/skincare.jpg",
+  "Whitening cream": "/skincare.jpg",
+  "Whitening face wash": "/skincare.jpg",
+  "Whitening soap": "/skincare.jpg",
+  "Sun block lotion spf 60": "/skincare.jpg",
+  "Sun block lotion spf 100": "/skincare.jpg",
+  "Scabies lotion": "/personal-care.jpg",
+  "Scabies soap": "/personal-care.jpg",
+  "Charcoal face wash": "/skincare.jpg",
+  "Facial products": "/skincare.jpg",
+  "Hair serum": "/hair-care.jpg",
+  "Hair oil": "/hair-care.jpg",
+  "Hair shampoo": "/hair-care.jpg",
+  "Hair shampoo plus conditioner": "/hair-care.jpg",
+  "Slimming Tea": "/personal-care.jpg",
 }
 
 export default function CategoriesGrid() {
+  const sorted = [...categories].sort((a, b) => Number(!!a.comingSoon) - Number(!!b.comingSoon))
   return (
     <section id="categories" className="py-12 bg-gray-50">
       <div className="container">
         <h2 className="text-2xl font-bold mb-8">Categories</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((category) => (
+          {sorted.map((category) => (
             <Link key={category.name} href={`/category/${category.name}`}>
               <Card className="overflow-hidden hover:shadow-md transition-transform hover:-translate-y-0.5 cursor-pointer h-full">
                 <div className="relative w-full h-48">
@@ -128,15 +153,8 @@ export default function CategoriesGrid() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                   {category.comingSoon && (
-                    <div className="absolute top-3 right-3 flex items-center justify-center">
-                      <Image
-                        src={"https://img.freepik.com/free-vector/coming-soon-neon-sign_23-2147857976.jpg"}
-                        alt="Coming Soon"
-                        width={64}
-                        height={64}
-                        className="rounded-md border border-white/40 shadow object-cover"
-                        priority
-                      />
+                    <div className="absolute top-3 left-3">
+                      <Badge variant="secondary">Coming Soon</Badge>
                     </div>
                   )}
                   <div className="absolute bottom-3 left-3 text-white font-semibold text-sm">
