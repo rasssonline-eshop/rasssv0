@@ -55,6 +55,47 @@ function getProduct(slug: string): Product {
   if (sampleCatalog[slug]) return sampleCatalog[slug]
   const rng = seededRng(strHash(slug))
   const price = Math.floor(rng() * 180) + 20
+  const prefix = slug.replace(/-product-.*$/, '')
+  const prefixImageMap: Record<string, string> = {
+    'fragrances': '/fragrances.jpg',
+    'makeup': '/makeup-products.png',
+    'baby-care-&-diapers': '/baby-care.jpg',
+    'vitamins': '/assorted-vitamins.png',
+    'skin-care': '/skincare.jpg',
+    'baby-accessories': '/baby-accessories.jpg',
+    'hair-care': '/hair-care.jpg',
+    'personal-care': '/personal-care.jpg',
+    'infant-milk-powder': '/baby-care.jpg',
+    'cereals': '/personal-care.jpg',
+    'balm': '/personal-care.jpg',
+    'heat-spray-(pain-killer)': '/personal-care.jpg',
+    'heat-lotion-(pain-killer)': '/personal-care.jpg',
+    'heat-cream-(pain-killer)': '/personal-care.jpg',
+    'hair-removing-spray': '/hair-care.jpg',
+    'acne-cream': '/skincare.jpg',
+    'acne-scar-cream': '/skincare.jpg',
+    'acne-serum': '/skincare.jpg',
+    'acne-face-wash': '/skincare.jpg',
+    'acne-soap': '/skincare.jpg',
+    'skin-beauty-cream': '/skincare.jpg',
+    'skin-moisturizer-lotion': '/skincare.jpg',
+    'moisturizer-soap': '/skincare.jpg',
+    'whitening-serum': '/skincare.jpg',
+    'whitening-cream': '/skincare.jpg',
+    'whitening-face-wash': '/skincare.jpg',
+    'whitening-soap': '/skincare.jpg',
+    'sun-block-lotion-spf-60': '/skincare.jpg',
+    'sun-block-lotion-spf-100': '/skincare.jpg',
+    'scabies-lotion': '/personal-care.jpg',
+    'scabies-soap': '/personal-care.jpg',
+    'charcoal-face-wash': '/skincare.jpg',
+    'facial-products': '/skincare.jpg',
+    'hair-serum': '/hair-care.jpg',
+    'hair-oil': '/hair-care.jpg',
+    'hair-shampoo': '/hair-care.jpg',
+    'hair-shampoo-plus-conditioner': '/hair-care.jpg',
+    'slimming-tea': '/personal-care.jpg',
+  }
   return {
     slug,
     name: slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
@@ -63,7 +104,7 @@ function getProduct(slug: string): Product {
     oldPrice: undefined,
     rating: 4.3,
     tags: ["Skin Care"],
-    image: "https://picsum.photos/seed/product-1/800/800",
+    image: prefixImageMap[prefix] || "https://picsum.photos/seed/product-1/800/800",
   }
 }
 
