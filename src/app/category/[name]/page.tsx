@@ -23,6 +23,32 @@ const categoryImages: Record<string, string> = {
   "Personal Care": "https://picsum.photos/seed/personal-care/600/600",
 }
 
+const comingSoonCategories = new Set([
+  "Acne cream",
+  "Acne scar cream",
+  "Acne serum",
+  "Acne face wash",
+  "Acne soap",
+  "Skin beauty cream",
+  "Skin moisturizer lotion",
+  "Moisturizer soap",
+  "Whitening serum",
+  "Whitening cream",
+  "Whitening face wash",
+  "Whitening soap",
+  "Sun block lotion spf 60",
+  "Sun block lotion spf 100",
+  "Scabies lotion",
+  "Scabies soap",
+  "Charcoal face wash",
+  "Facial products",
+  "Hair serum",
+  "Hair oil",
+  "Hair shampoo",
+  "Hair shampoo plus conditioner",
+  "Slimming Tea",
+])
+
 function strHash(s: string) {
   let h = 0
   for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0
@@ -108,7 +134,7 @@ export default function CategoryPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {sorted.map((product) => (
             <Link key={product.id} href={`/product/${product.slug}`}>
-              <Card className="overflow-hidden hover:shadow-lg transition">
+              <Card className="overflow-hidden hover:shadow-md transition-transform hover:-translate-y-0.5">
                 <div className="relative aspect-square overflow-hidden">
                   <Image
                     src={categoryImages[name] || categoryImages["Skin Care"]}
@@ -118,6 +144,17 @@ export default function CategoryPage() {
                     sizes="(max-width:768px) 100vw, 25vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  {comingSoonCategories.has(name) && (
+                    <div className="absolute top-3 right-3">
+                      <Image
+                        src="https://img.freepik.com/free-vector/coming-soon-neon-sign_23-2147857976.jpg"
+                        alt="Coming Soon"
+                        width={64}
+                        height={64}
+                        className="rounded-md border border-white/40 shadow object-cover"
+                      />
+                    </div>
+                  )}
                   <div className="absolute bottom-3 left-3 text-white font-semibold text-sm">
                     {name}
                   </div>

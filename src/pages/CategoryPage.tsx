@@ -25,6 +25,32 @@ export default function CategoryPage() {
 
   const baseName = typeof name === 'string' ? name : String(name ?? '')
   const rngBase = seededRng(strHash(baseName))
+  const comingSoonCategories = new Set([
+    'Acne cream',
+    'Acne scar cream',
+    'Acne serum',
+    'Acne face wash',
+    'Acne soap',
+    'Skin beauty cream',
+    'Skin moisturizer lotion',
+    'Moisturizer soap',
+    'Whitening serum',
+    'Whitening cream',
+    'Whitening face wash',
+    'Whitening soap',
+    'Sun block lotion spf 60',
+    'Sun block lotion spf 100',
+    'Scabies lotion',
+    'Scabies soap',
+    'Charcoal face wash',
+    'Facial products',
+    'Hair serum',
+    'Hair oil',
+    'Hair shampoo',
+    'Hair shampoo plus conditioner',
+    'Slimming Tea',
+  ])
+  const isComingSoon = comingSoonCategories.has(baseName)
 
   const products = Array(12)
     .fill(null)
@@ -44,13 +70,20 @@ export default function CategoryPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-            <Card key={product.id} className="overflow-hidden hover:shadow-lg transition">
+            <Card key={product.id} className="overflow-hidden hover:shadow-md transition-transform hover:-translate-y-0.5">
               <div className="relative aspect-square overflow-hidden bg-gray-200">
                 <img
                   src={product.image || "/placeholder.svg"}
                   alt={product.name}
                   className="w-full h-full object-cover hover:scale-105 transition"
                 />
+                {isComingSoon && (
+                  <img
+                    src="https://img.freepik.com/free-vector/coming-soon-neon-sign_23-2147857976.jpg"
+                    alt="Coming Soon"
+                    className="absolute top-3 right-3 w-16 h-16 object-cover rounded-md border border-white/40 shadow"
+                  />
+                )}
               </div>
               <div className="p-4">
                 <h3 className="font-semibold text-sm line-clamp-2 mb-2">{product.name}</h3>

@@ -17,7 +17,7 @@ export default function BrandShowcase() {
             {brands.map((brand) => (
               <Card
                 key={brand.id}
-                className="bg-gray-200 aspect-square flex items-center justify-center cursor-pointer hover:shadow-lg transition"
+                className="bg-gray-200 aspect-square flex items-center justify-center cursor-pointer hover:shadow-md transition-transform hover:-translate-y-0.5"
               >
                 <span className="text-sm font-medium text-gray-400">{brand.name}</span>
               </Card>

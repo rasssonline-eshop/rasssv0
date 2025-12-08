@@ -1,6 +1,7 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -37,6 +38,57 @@ const categories = [
     name: "Personal Care",
     subcategories: ["Deodorants", "Soaps"],
   },
+  {
+    name: "Infant Milk Powder",
+    subcategories: ["Stage 1", "Stage 2", "Stage 3", "LF", "Premature"],
+  },
+  {
+    name: "Cereals",
+    subcategories: ["Infant", "Adult"],
+  },
+  {
+    name: "Balm",
+    subcategories: ["Pain Relief", "Cooling"],
+  },
+  {
+    name: "Heat spray (Pain killer)",
+    subcategories: ["Spray"],
+  },
+  {
+    name: "Heat lotion (Pain Killer)",
+    subcategories: ["Lotion"],
+  },
+  {
+    name: "Heat cream (Pain Killer)",
+    subcategories: ["Cream"],
+  },
+  {
+    name: "Hair removing spray",
+    subcategories: ["Body", "Face"],
+  },
+  { name: "Acne cream", subcategories: ["Treatment"], comingSoon: true },
+  { name: "Acne scar cream", subcategories: ["Treatment"], comingSoon: true },
+  { name: "Acne serum", subcategories: ["Serum"], comingSoon: true },
+  { name: "Acne face wash", subcategories: ["Cleanser"], comingSoon: true },
+  { name: "Acne soap", subcategories: ["Soap"], comingSoon: true },
+  { name: "Skin beauty cream", subcategories: ["Cream"], comingSoon: true },
+  { name: "Skin moisturizer lotion", subcategories: ["Lotion"], comingSoon: true },
+  { name: "Moisturizer soap", subcategories: ["Soap"], comingSoon: true },
+  { name: "Whitening serum", subcategories: ["Serum"], comingSoon: true },
+  { name: "Whitening cream", subcategories: ["Cream"], comingSoon: true },
+  { name: "Whitening face wash", subcategories: ["Cleanser"], comingSoon: true },
+  { name: "Whitening soap", subcategories: ["Soap"], comingSoon: true },
+  { name: "Sun block lotion spf 60", subcategories: ["SPF 60"], comingSoon: true },
+  { name: "Sun block lotion spf 100", subcategories: ["SPF 100"], comingSoon: true },
+  { name: "Scabies lotion", subcategories: ["Lotion"], comingSoon: true },
+  { name: "Scabies soap", subcategories: ["Soap"], comingSoon: true },
+  { name: "Charcoal face wash", subcategories: ["Cleanser"], comingSoon: true },
+  { name: "Facial products", subcategories: ["Kits"], comingSoon: true },
+  { name: "Hair serum", subcategories: ["Serum"], comingSoon: true },
+  { name: "Hair oil", subcategories: ["Oil"], comingSoon: true },
+  { name: "Hair shampoo", subcategories: ["Shampoo"], comingSoon: true },
+  { name: "Hair shampoo plus conditioner", subcategories: ["2-in-1"], comingSoon: true },
+  { name: "Slimming Tea", subcategories: ["Tea"], comingSoon: true },
 ]
 
 const categoryImages: Record<string, string> = {
@@ -48,6 +100,13 @@ const categoryImages: Record<string, string> = {
   "Baby Accessories": "https://picsum.photos/seed/baby-accessories/600/400",
   "Hair Care": "https://picsum.photos/seed/haircare/600/400",
   "Personal Care": "https://picsum.photos/seed/personal-care/600/400",
+  "Infant Milk Powder": "https://picsum.photos/seed/infant-milk/600/400",
+  Cereals: "https://picsum.photos/seed/cereals/600/400",
+  Balm: "https://picsum.photos/seed/balm/600/400",
+  "Heat spray (Pain killer)": "https://picsum.photos/seed/heat-spray/600/400",
+  "Heat lotion (Pain Killer)": "https://picsum.photos/seed/heat-lotion/600/400",
+  "Heat cream (Pain Killer)": "https://picsum.photos/seed/heat-cream/600/400",
+  "Hair removing spray": "https://picsum.photos/seed/hair-removing/600/400",
 }
 
 export default function CategoriesGrid() {
@@ -58,7 +117,7 @@ export default function CategoriesGrid() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((category) => (
             <Link key={category.name} href={`/category/${category.name}`}>
-              <Card className="overflow-hidden hover:shadow-lg transition cursor-pointer h-full">
+              <Card className="overflow-hidden hover:shadow-md transition-transform hover:-translate-y-0.5 cursor-pointer h-full">
                 <div className="relative w-full h-48">
                   <Image
                     src={categoryImages[category.name] || categoryImages["Skin Care"]}
@@ -68,6 +127,18 @@ export default function CategoriesGrid() {
                     sizes="(max-width:768px) 100vw, 25vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  {category.comingSoon && (
+                    <div className="absolute top-3 right-3 flex items-center justify-center">
+                      <Image
+                        src={"https://img.freepik.com/free-vector/coming-soon-neon-sign_23-2147857976.jpg"}
+                        alt="Coming Soon"
+                        width={64}
+                        height={64}
+                        className="rounded-md border border-white/40 shadow object-cover"
+                        priority
+                      />
+                    </div>
+                  )}
                   <div className="absolute bottom-3 left-3 text-white font-semibold text-sm">
                     {category.name}
                   </div>

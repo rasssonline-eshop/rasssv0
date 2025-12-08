@@ -70,6 +70,33 @@ function getProduct(slug: string): Product {
 export default function ProductDetailPage() {
   const params = useParams<{ slug: string }>()!
   const product = getProduct(params.slug)
+  const comingSoonPrefixes = new Set([
+    'acne-cream',
+    'acne-scar-cream',
+    'acne-serum',
+    'acne-face-wash',
+    'acne-soap',
+    'skin-beauty-cream',
+    'skin-moisturizer-lotion',
+    'moisturizer-soap',
+    'whitening-serum',
+    'whitening-cream',
+    'whitening-face-wash',
+    'whitening-soap',
+    'sun-block-lotion-spf-60',
+    'sun-block-lotion-spf-100',
+    'scabies-lotion',
+    'scabies-soap',
+    'charcoal-face-wash',
+    'facial-products',
+    'hair-serum',
+    'hair-oil',
+    'hair-shampoo',
+    'hair-shampoo-plus-conditioner',
+    'slimming-tea',
+  ])
+  const prefix = product.slug.replace(/-product-.*$/, '')
+  const isComingSoon = comingSoonPrefixes.has(prefix)
   const images = [
     product.image,
     "https://picsum.photos/seed/product-2/800/800",
@@ -107,6 +134,17 @@ export default function ProductDetailPage() {
               className="object-contain"
               sizes="(max-width: 768px) 100vw, 33vw"
             />
+            {isComingSoon && (
+              <div className="absolute top-3 right-3">
+                <Image
+                  src="https://img.freepik.com/free-vector/coming-soon-neon-sign_23-2147857976.jpg"
+                  alt="Coming Soon"
+                  width={64}
+                  height={64}
+                  className="rounded-md border border-gray-200 shadow object-cover"
+                />
+              </div>
+            )}
           </div>
           <div className="mt-4 grid grid-cols-5 gap-2">
             {images.map((src, i) => (
@@ -137,22 +175,16 @@ export default function ProductDetailPage() {
 
           <div className="flex items-baseline gap-3">
             <span className="text-3xl font-bold text-primary">{formatPKR(product.price)}</span>
-            {product.oldPrice && (
-              <span className="text-gray-500 line-through">{formatPKR(product.oldPrice)}</span>
-            )}
-            {product.oldPrice && (
-              <Badge>Online Exclusive · Save {Math.round(100 - (product.price / product.oldPrice) * 100)}%</Badge>
-            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="rounded-lg border bg-white p-3 flex items-center gap-2">
+          <div className="rounded-lg border bg-white p-3 flex items-center gap-2 transition-transform hover:-translate-y-0.5 hover:shadow-sm">
               <Truck className="w-4 h-4 text-primary" /> Same-day delivery in Lahore
             </div>
-            <div className="rounded-lg border bg-white p-3 flex items-center gap-2">
+          <div className="rounded-lg border bg-white p-3 flex items-center gap-2 transition-transform hover:-translate-y-0.5 hover:shadow-sm">
               <CreditCard className="w-4 h-4 text-primary" /> Cash on Delivery available
             </div>
-            <div className="rounded-lg border bg-white p-3 flex items-center gap-2">
+          <div className="rounded-lg border bg-white p-3 flex items-center gap-2 transition-transform hover:-translate-y-0.5 hover:shadow-sm">
               <CheckCircle className="w-4 h-4 text-primary" /> In Stock
             </div>
           </div>
@@ -208,7 +240,7 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1,2,3,4].map((i) => (
             <Link key={i} href={`/product/sample-related-${i}`} className="block">
-              <div className="rounded-lg border bg-white overflow-hidden hover:shadow-sm">
+              <div className="rounded-lg border bg-white overflow-hidden hover:shadow-md transition-transform hover:-translate-y-0.5">
                 <div className="relative w-full aspect-square">
                   <Image src={`https://picsum.photos/seed/related-${i}/600/600`} alt="Related" fill className="object-cover" sizes="(max-width:768px) 100vw, 25vw" />
                 </div>

@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Link } from "react-router-dom"
 
 const categories = [
@@ -42,6 +43,40 @@ const categories = [
     subcategories: ["Deodorants", "Soaps"],
     image: "/personal-care.jpg",
   },
+  {
+    name: "Infant Milk Powder",
+    subcategories: ["Stage 1", "Stage 2", "Stage 3", "LF", "Premature"],
+    image: "/placeholder.svg",
+  },
+  { name: "Cereals", subcategories: ["Infant", "Adult"], image: "/placeholder.svg" },
+  { name: "Balm", subcategories: ["Pain Relief", "Cooling"], image: "/placeholder.svg" },
+  { name: "Heat spray (Pain killer)", subcategories: ["Spray"], image: "/placeholder.svg" },
+  { name: "Heat lotion (Pain Killer)", subcategories: ["Lotion"], image: "/placeholder.svg" },
+  { name: "Heat cream (Pain Killer)", subcategories: ["Cream"], image: "/placeholder.svg" },
+  { name: "Hair removing spray", subcategories: ["Body", "Face"], image: "/placeholder.svg" },
+  { name: "Acne cream", subcategories: ["Treatment"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Acne scar cream", subcategories: ["Treatment"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Acne serum", subcategories: ["Serum"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Acne face wash", subcategories: ["Cleanser"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Acne soap", subcategories: ["Soap"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Skin beauty cream", subcategories: ["Cream"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Skin moisturizer lotion", subcategories: ["Lotion"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Moisturizer soap", subcategories: ["Soap"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Whitening serum", subcategories: ["Serum"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Whitening cream", subcategories: ["Cream"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Whitening face wash", subcategories: ["Cleanser"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Whitening soap", subcategories: ["Soap"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Sun block lotion spf 60", subcategories: ["SPF 60"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Sun block lotion spf 100", subcategories: ["SPF 100"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Scabies lotion", subcategories: ["Lotion"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Scabies soap", subcategories: ["Soap"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Charcoal face wash", subcategories: ["Cleanser"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Facial products", subcategories: ["Kits"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Hair serum", subcategories: ["Serum"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Hair oil", subcategories: ["Oil"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Hair shampoo", subcategories: ["Shampoo"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Hair shampoo plus conditioner", subcategories: ["2-in-1"], image: "/placeholder.svg", comingSoon: true },
+  { name: "Slimming Tea", subcategories: ["Tea"], image: "/placeholder.svg", comingSoon: true },
 ]
 
 export default function CategoriesGrid() {
@@ -52,12 +87,21 @@ export default function CategoriesGrid() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((category) => (
             <Link key={category.name} to={`/category/${category.name}`}>
-              <Card className="overflow-hidden hover:shadow-lg transition cursor-pointer h-full">
+              <Card className="overflow-hidden hover:shadow-md transition-transform hover:-translate-y-0.5 cursor-pointer h-full">
                 <img
                   src={category.image || "/placeholder.svg"}
                   alt={category.name}
                   className="w-full h-48 object-cover"
                 />
+                {category.comingSoon && (
+                  <div className="absolute top-3 right-3">
+                    <img
+                      src="https://ik.imagekit.io/vfhlzpxfu/assets/dummy/AR12%20%2825%29.jpg"
+                      alt="Coming Soon"
+                      className="w-12 h-12 object-contain rounded-md border border-white/40 shadow"
+                    />
+                  </div>
+                )}
                 <div className="p-4">
                   <h3 className="font-bold text-lg mb-2">{category.name}</h3>
                   <div className="space-y-1">
