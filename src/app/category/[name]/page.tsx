@@ -67,7 +67,10 @@ function seededRng(seed: number) {
 
 export default function CategoryPage() {
   const params = useParams<{ name: string }>()!
-  const name = params.name
+  const nameRaw = params.name
+  const name = (() => {
+    try { return decodeURIComponent(nameRaw) } catch { return nameRaw }
+  })()
   const { addItem } = useCart()
 
   const brands = ["Uriage", "Vichy", "Avene", "Bioderma", "Cerave"]
@@ -134,7 +137,7 @@ export default function CategoryPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {sorted.map((product) => (
             <Link key={product.id} href={`/product/${product.slug}`}>
-              <Card className="overflow-hidden hover:shadow-md transition-transform hover:-translate-y-0.5">
+              <Card className="bg-white rounded-xl border overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 hover:ring-2 hover:ring-primary/30 active:scale-95 active:ring-primary/40">
                 <div className="relative aspect-square overflow-hidden">
                   <Image
                     src={categoryImages[name] || categoryImages["Skin Care"]}

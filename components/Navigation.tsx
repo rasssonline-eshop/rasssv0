@@ -19,8 +19,8 @@ const categories = [
 export default function Navigation() {
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-[calc(var(--header-height)-6px)] z-40 shadow-sm">
-      <div className="px-4 overflow-x-auto no-scrollbar">
-        <div className="flex items-center gap-4 sm:gap-6 py-2 flex-nowrap">
+      <div className="px-4">
+        <div className="flex items-center gap-4 sm:gap-6 py-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="gap-2 bg-transparent text-foreground">
@@ -67,6 +67,19 @@ export default function Navigation() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          </div>
+        </div>
+        <div className="pb-2 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 sm:gap-3 flex-nowrap">
+            {categories.map((cat) => (
+              <Link
+                key={cat}
+                href={`/category/${encodeURIComponent(cat)}`}
+                className="px-3 py-1.5 rounded-full border bg-white text-gray-700 hover:bg-gray-50 whitespace-nowrap text-sm"
+              >
+                {cat}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

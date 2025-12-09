@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button"
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white">
-      <div className="max-w-7xl mx-auto px-4 py-12">
+    <footer className="bg-[#2c6ba4] text-white">
+      <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h4 className="font-bold text-lg mb-4">RASSS Online</h4>
+            <h4 className="font-bold text-lg mb-4">Rasss Online</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li>
                 <a href="#" className="hover:text-white">
@@ -54,7 +54,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-bold text-lg mb-4">RASSS Medical</h4>
+            <h4 className="font-bold text-lg mb-4">Rasss Medical</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li>
                 <a href="#" className="hover:text-white">
@@ -70,7 +70,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-bold text-lg mb-4">Follow RASSS</h4>
+            <h4 className="font-bold text-lg mb-4">Follow Rasss</h4>
             <div className="flex gap-3 mb-6">
               <Button
                 size="icon"
@@ -114,7 +114,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-700 pt-8">
+        <div className="border-t border-white/20 pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-gray-400">
             <div>
               <h5 className="font-bold text-white mb-3">Quick Links</h5>
@@ -136,8 +136,8 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-400">
-          <p>&copy; 2025 RASSS. All rights reserved.</p>
+        <div className="border-t border-white/20 mt-8 pt-8 text-center text-sm text-gray-200">
+          <p>&copy; 2025 Rasss Pakistan · Lahore</p>
         </div>
       </div>
     </footer>

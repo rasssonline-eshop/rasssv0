@@ -110,7 +110,11 @@ function getProduct(slug: string): Product {
 
 export default function ProductDetailPage() {
   const params = useParams<{ slug: string }>()!
-  const product = getProduct(params.slug)
+  const slugRaw = params.slug
+  const slug = (() => {
+    try { return decodeURIComponent(slugRaw) } catch { return slugRaw }
+  })()
+  const product = getProduct(slug)
   const comingSoonPrefixes = new Set([
     'acne-cream',
     'acne-scar-cream',
@@ -183,7 +187,11 @@ export default function ProductDetailPage() {
           </div>
           <div className="mt-4 grid grid-cols-5 gap-2">
             {images.map((src, i) => (
-              <button key={i} onClick={() => setActive(i)} className="relative aspect-square rounded-md overflow-hidden border border-gray-200">
+              <button
+                key={i}
+                onClick={() => setActive(i)}
+                className={`relative aspect-square rounded-md overflow-hidden border ${i === active ? 'border-primary ring-2 ring-primary/50' : 'border-gray-200'}`}
+              >
                 <Image src={src} alt={product.name} fill className="object-cover" sizes="100px" />
               </button>
             ))}
@@ -210,6 +218,11 @@ export default function ProductDetailPage() {
 
           <div className="flex items-baseline gap-3">
             <span className="text-3xl font-bold text-primary">{formatPKR(product.price)}</span>
+          </div>
+          <div>
+            <Button className="bg-primary hover:bg-primary/90" onClick={() => { addItem({ id: product.slug, slug: product.slug, name: product.name, price: product.price, image: images[active] }, 1); setOpen(true) }}>
+              Add to Cart
+            </Button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

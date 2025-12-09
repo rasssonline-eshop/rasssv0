@@ -128,7 +128,7 @@ export default function CategoriesGrid() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {sorted.map((category) => (
             <Link key={category.name} to={`/category/${category.name}`}>
-              <Card className="overflow-hidden hover:shadow-md transition-transform hover:-translate-y-0.5 cursor-pointer h-full">
+              <Card className="overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 hover:ring-2 hover:ring-primary/30 active:scale-95 active:ring-primary/40 cursor-pointer h-full">
                 <img
                   src={imageMap[category.name] || category.image || "/placeholder.svg"}
                   alt={category.name}

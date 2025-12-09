@@ -24,7 +24,10 @@ export default function CategoryPage() {
     }
   }
 
-  const baseName = typeof name === 'string' ? name : String(name ?? '')
+  const rawName = typeof name === 'string' ? name : String(name ?? '')
+  const baseName = (() => {
+    try { return decodeURIComponent(rawName) } catch { return rawName }
+  })()
   const rngBase = seededRng(strHash(baseName))
   const comingSoonCategories = new Set([
     'Acne cream',
@@ -65,18 +68,18 @@ export default function CategoryPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="container">
         <h1 className="text-3xl font-bold mb-2">{name}</h1>
-        <p className="text-gray-600 mb-8">Showing {products.length} products</p>
+        <p className="text-gray-600 mb-6">Showing {products.length} products</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-            <Card key={product.id} className="overflow-hidden hover:shadow-md transition-transform hover:-translate-y-0.5">
-              <div className="relative aspect-square overflow-hidden bg-gray-200">
+            <Card key={product.id} className="bg-white rounded-xl border overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 hover:ring-2 hover:ring-primary/30 active:scale-95 active:ring-primary/40">
+              <div className="relative aspect-square overflow-hidden bg-gray-100">
                 <img
                   src={product.image || "/placeholder.svg"}
                   alt={product.name}
-                  className="w-full h-full object-cover hover:scale-105 transition"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 {isComingSoon && (
                   <div className="absolute top-3 left-3">

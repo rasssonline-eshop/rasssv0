@@ -57,7 +57,7 @@ export default function FlashSalesPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {deals.map((d) => (
           <Link key={d.id} href={`/product/${d.slug}`}>
-            <Card className="overflow-hidden hover:shadow-md transition-transform hover:-translate-y-0.5 cursor-pointer">
+            <Card className="overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 hover:ring-2 hover:ring-primary/30 active:scale-95 active:ring-primary/40 cursor-pointer">
               <div className="relative w-full h-48">
                 <Image src={d.image} alt={d.name} fill className="object-cover" sizes="(max-width:768px) 100vw, 25vw" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
