@@ -7,6 +7,17 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/icon-dark-32x32.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RASSS - Health & Beauty</title>
+    <script>
+      (function(){
+        try {
+          var l = localStorage.getItem('lang');
+          if (l) {
+            document.documentElement.setAttribute('lang', l==='ur'?'ur':'en');
+            document.documentElement.setAttribute('dir', l==='ur'?'rtl':'ltr');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

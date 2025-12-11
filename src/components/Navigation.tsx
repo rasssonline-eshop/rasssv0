@@ -35,7 +35,7 @@ export default function Navigation() {
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-[calc(var(--header-height,56px)-6px)] z-40 shadow-sm">
       <div className="px-4">
-        <div className="container flex items-center gap-4 sm:gap-6 py-2">
+        <div className="container hidden sm:flex items-center gap-4 sm:gap-6 py-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="gap-2 bg-transparent">
@@ -70,7 +70,7 @@ export default function Navigation() {
             <ChevronDown className="w-4 h-4" />
           </div>
         </div>
-        <div className="container pb-2 overflow-x-auto no-scrollbar">
+        <div className="container py-1 overflow-x-auto no-scrollbar snap-x snap-mandatory">
           <div className="flex items-center gap-2 sm:gap-3 flex-nowrap">
             {categories.map((cat) => {
               const href = `/category/${encodeURIComponent(cat)}`
@@ -79,7 +79,7 @@ export default function Navigation() {
                 <Link
                   key={cat}
                   to={href}
-                  className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm border ${active ? 'bg-primary text-white border-primary hover:bg-primary/90' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                  className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm border snap-start ${active ? 'bg-primary text-white border-primary hover:bg-primary/90' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
                 >
                   {labelFor(cat)}
                 </Link>

@@ -32,11 +32,11 @@ export default function Header() {
       ref={ref}
       className="bg-[#2c6ba4] text-white sticky top-0 z-50 shadow-sm backdrop-blur-sm"
     >
-      <div className="px-4 py-2">
-        <div className="flex items-center gap-4">
+      <div className="px-3 py-1 sm:py-2">
+        <div className="flex items-center gap-2 sm:gap-4">
 
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
 
             <Image
               src="/Rasss-logo1.png"
@@ -44,13 +44,15 @@ export default function Header() {
               width={96}
               height={26}
               className="opacity-95"
+              priority
+              sizes="96px"
             />
           </div>
 
           {/* Deliver Location */}
           <Dialog>
             <DialogTrigger asChild>
-              <button className="flex items-center gap-2 ml-2 text-sm bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-3 py-1.5">
+              <button className="flex items-center gap-1 sm:gap-2 ml-2 text-xs sm:text-sm bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-2 sm:px-3 py-1 sm:py-1.5 whitespace-nowrap truncate max-w-[120px] sm:max-w-none">
                 <MapPin className="w-4 h-4 text-white" />
                 <span className="text-white/90">{t("deliverTo")}</span>
                 <span className="font-medium">{city}</span>
@@ -84,8 +86,8 @@ export default function Header() {
             </DialogContent>
           </Dialog>
 
-          {/* Search Bar */}
-          <div className="flex-1">
+          {/* Search Bar (hidden on mobile) */}
+          <div className="hidden sm:block flex-1 min-w-0">
             <Input
               placeholder={t("search.placeholder")}
               className="w-full h-9 bg-white/10 text-white placeholder:text-white/60 border border-white/20 rounded-xl backdrop-blur-sm"

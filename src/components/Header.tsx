@@ -2,6 +2,7 @@ import { Heart, ShoppingCart, Globe, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useI18n } from "@/components/I18nProvider"
+import React from "react"
 
 export default function Header() {
   const { lang, setLang, t } = useI18n()
@@ -10,7 +11,7 @@ export default function Header() {
       <div className="container py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="text-2xl font-bold tracking-tight">Rasss</div>
+            <img src="/Rasss-logo1.png" alt="Rasss" className="h-6 w-auto shrink-0" />
             <span className="text-xs sm:text-sm opacity-90">{lang === 'ur' ? 'ہیلتھ اینڈ بیوٹی' : 'Health & Beauty'}</span>
           </div>
           <div className="hidden lg:flex items-center gap-2 text-sm">
@@ -32,7 +33,7 @@ export default function Header() {
             </Button>
           </div>
         </div>
-        <div className="mt-3">
+        <div className="mt-3 hidden sm:block">
           <Input
             placeholder={t('search.placeholder')}
             className="w-full h-10 bg-white/10 text-white placeholder:text-white/60 border border-white/20"

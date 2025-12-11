@@ -43,8 +43,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var l=localStorage.getItem('lang');if(l){document.documentElement.setAttribute('lang', l==='ur'?'ur':'en');document.documentElement.setAttribute('dir', l==='ur'?'rtl':'ltr');}}catch{}})()",
+          }}
+        />
         <I18nProvider>
           <LocationProvider>
             <CartProvider>

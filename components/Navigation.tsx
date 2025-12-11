@@ -41,7 +41,7 @@ export default function Navigation() {
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-[calc(var(--header-height)-6px)] z-40 shadow-sm">
       <div className="px-4 overflow-x-auto no-scrollbar">
-        <div className="flex items-center gap-4 sm:gap-6 py-2 flex-nowrap">
+        <div className="hidden sm:flex items-center gap-4 sm:gap-6 py-2 flex-nowrap">
           {/* CATEGORY DROPDOWN */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -157,17 +157,17 @@ export default function Navigation() {
         </div>
 
         {/* CATEGORY PILLS */}
-        <div className="pb-2 overflow-x-auto no-scrollbar relative">
+        <div className="py-1 overflow-x-auto no-scrollbar relative snap-x snap-mandatory">
           <div className="flex items-center gap-2 sm:gap-3 flex-nowrap">
-              {categories.map((cat) => (
-                <Link
-                  key={cat}
-                  href={`/category/${encodeURIComponent(cat)}`}
-                  className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm border ${pathname?.startsWith(`/category/${encodeURIComponent(cat)}`) ? 'bg-primary text-white border-primary hover:bg-primary/90' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
-                >
+            {categories.map((cat) => (
+              <Link
+                key={cat}
+                href={`/category/${encodeURIComponent(cat)}`}
+                className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm border snap-start ${pathname?.startsWith(`/category/${encodeURIComponent(cat)}`) ? 'bg-primary text-white border-primary hover:bg-primary/90' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+              >
                 {labelFor(cat)}
-                </Link>
-              ))}
+              </Link>
+            ))}
           </div>
           <div className="hidden md:block pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white to-transparent" />
           <div className="hidden md:block pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent" />
