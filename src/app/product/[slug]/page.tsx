@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Star, Phone, ShieldCheck, Thermometer, CreditCard, Truck, CheckCircle } from "lucide-react"
 import { formatPKR } from "@/lib/utils"
 import { useCart } from "@/components/CartProvider"
+import { useLocation } from "@/components/LocationProvider"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
+import { useI18n } from "@/components/I18nProvider"
 
 type Product = {
   slug: string
@@ -151,6 +153,9 @@ export default function ProductDetailPage() {
   ]
   const [active, setActive] = React.useState(0)
   const { addItem, setOpen } = useCart()
+  const { city } = useLocation()
+  const sameDay = city.toLowerCase() === 'lahore'
+  const { t } = useI18n()
 
   return (
     <div className="container py-8">
@@ -221,33 +226,33 @@ export default function ProductDetailPage() {
           </div>
           <div>
             <Button className="bg-primary hover:bg-primary/90" onClick={() => { addItem({ id: product.slug, slug: product.slug, name: product.name, price: product.price, image: images[active] }, 1); setOpen(true) }}>
-              Add to Cart
+              {t("button.addToCart")}
             </Button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="rounded-lg border bg-white p-3 flex items-center gap-2 transition-transform hover:-translate-y-0.5 hover:shadow-sm">
-              <Truck className="w-4 h-4 text-primary" /> Same-day delivery in Lahore
+            <div className="rounded-lg border bg-white p-3 flex items-center gap-2 transition-transform hover:-translate-y-0.5 hover:shadow-sm">
+              <Truck className="w-4 h-4 text-primary" /> {sameDay ? `Same-day delivery in ${city}` : `Delivery to ${city} in 2–4 days`}
+            </div>
+            <div className="rounded-lg border bg-white p-3 flex items-center gap-2 transition-transform hover:-translate-y-0.5 hover:shadow-sm">
+              <CreditCard className="w-4 h-4 text-primary" /> {t("product.cashOnDelivery")}
             </div>
           <div className="rounded-lg border bg-white p-3 flex items-center gap-2 transition-transform hover:-translate-y-0.5 hover:shadow-sm">
-              <CreditCard className="w-4 h-4 text-primary" /> Cash on Delivery available
-            </div>
-          <div className="rounded-lg border bg-white p-3 flex items-center gap-2 transition-transform hover:-translate-y-0.5 hover:shadow-sm">
-              <CheckCircle className="w-4 h-4 text-primary" /> In Stock
+              <CheckCircle className="w-4 h-4 text-primary" /> {t("product.inStock")}
             </div>
           </div>
 
           <div className="rounded-lg border border-gray-200 bg-white">
             <details className="p-4">
-              <summary className="cursor-pointer font-medium">Highlights</summary>
+              <summary className="cursor-pointer font-medium">{t("product.highlights")}</summary>
               <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700">
                 {(product.tags || ["Skin Care"]).map((t, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-primary" /> {t}
                   </div>
                 ))}
-                <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /> Genuine brands</div>
-                <div className="flex items-center gap-2"><Thermometer className="w-4 h-4 text-primary" /> Temperature Controlled</div>
+                <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /> {t("product.genuineBrands")}</div>
+                <div className="flex items-center gap-2"><Thermometer className="w-4 h-4 text-primary" /> {t("product.temperatureControlled")}</div>
               </div>
             </details>
           </div>

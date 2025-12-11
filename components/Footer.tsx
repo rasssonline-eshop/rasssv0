@@ -2,54 +2,51 @@
 
 import { Facebook, Instagram, Linkedin, Twitter, Smartphone } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useI18n } from "@/components/I18nProvider"
 
 export default function Footer() {
+  const { t } = useI18n()
   return (
     <footer className="bg-[#2c6ba4] text-white">
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h4 className="font-bold text-lg mb-4">Rasss Online</h4>
+            <h4 className="font-bold text-lg mb-4">{t("footer.rasssOnline")}</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li>
                 <a href="#" className="hover:text-white">
-                  Home
+                  {t("footer.home")}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-white">
-                  All Categories
+                  {t("footer.allCategories")}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-white">
-                  Flash Sales
+                  {t("footer.flashSales")}
                 </a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-lg mb-4">Guest Services</h4>
+            <h4 className="font-bold text-lg mb-4">{t("footer.guestServices")}</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li>
                 <a href="#" className="hover:text-white">
-                  Delivery Information
+                  {t("footer.deliveryInfo")}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-white">
-                  Returns & Exchange
+                  {t("footer.returnsExchange")}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-white">
-                  Contact Us
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  FAQs
+                  {t("footer.contactUs")}
                 </a>
               </li>
             </ul>
@@ -119,19 +116,19 @@ export default function Footer() {
         <div className="border-t border-white/20 pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-gray-400">
             <div>
-              <h5 className="font-bold text-white mb-3">Quick Links</h5>
+              <h5 className="font-bold text-white mb-3">{t("footer.quickLinks")}</h5>
               <div className="grid grid-cols-2 gap-2">
                 <a href="#" className="hover:text-white">
-                  Fragrances
+                  {t("footer.fragrances")}
                 </a>
                 <a href="#" className="hover:text-white">
-                  Makeup
+                  {t("footer.makeup")}
                 </a>
                 <a href="#" className="hover:text-white">
-                  Baby Care
+                  {t("footer.babyCare")}
                 </a>
                 <a href="#" className="hover:text-white">
-                  Vitamins
+                  {t("footer.vitamins")}
                 </a>
               </div>
             </div>

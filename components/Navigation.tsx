@@ -8,6 +8,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { usePathname } from "next/navigation"
+import { useI18n } from "@/components/I18nProvider"
 
 const categories = [
   "Fragrances",
@@ -21,6 +23,21 @@ const categories = [
 ]
 
 export default function Navigation() {
+  const pathname = usePathname()
+  const { t } = useI18n()
+  const labelFor = (cat: string) => {
+    switch (cat) {
+      case "Fragrances": return t("cat.fragrances")
+      case "Makeup": return t("cat.makeup")
+      case "Baby Care & Diapers": return t("cat.babyCareDiapers")
+      case "Vitamins": return t("cat.vitamins")
+      case "Skin Care": return t("cat.skinCare")
+      case "Baby Accessories": return t("cat.babyAccessories")
+      case "Hair Care": return t("cat.hairCare")
+      case "Personal Care": return t("cat.personalCare")
+      default: return cat
+    }
+  }
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-[calc(var(--header-height)-6px)] z-40 shadow-sm">
       <div className="px-4 overflow-x-auto no-scrollbar">
@@ -38,9 +55,7 @@ export default function Navigation() {
                   group
                 "
               >
-                <span className="transition-all duration-300 group-hover:text-blue-600 group-hover:drop-shadow-[0_0_4px_rgba(0,123,255,0.25)]">
-                  Shop by Category
-                </span>
+                <span className="transition-all duration-300 group-hover:text-blue-600 group-hover:drop-shadow-[0_0_4px_rgba(0,123,255,0.25)]">{t("nav.shopByCategory")}</span>
                 <ChevronDown className="w-4 h-4 inline-block ml-1" />
                 <span
                   className="
@@ -74,9 +89,7 @@ export default function Navigation() {
                   group
                 "
               >
-                <span className="transition-all duration-300 group-hover:text-blue-600 group-hover:drop-shadow-[0_0_4px_rgba(0,123,255,0.25)]">
-                  E-Services
-                </span>
+                <span className="transition-all duration-300 group-hover:text-blue-600 group-hover:drop-shadow-[0_0_4px_rgba(0,123,255,0.25)]">{t("nav.eServices")}</span>
                 <ChevronDown className="w-4 h-4 inline-block ml-1" />
                 <span
                   className="
@@ -92,7 +105,7 @@ export default function Navigation() {
 
             <DropdownMenuContent align="start" className="w-56">
               <DropdownMenuItem asChild>
-                <Link href="/healthcare-center">Health Center</Link>
+                <Link href="/healthcare-center">{t("nav.healthcareCenter")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/e-services/consult-a-gp">Consult a GP</Link>
@@ -101,11 +114,9 @@ export default function Navigation() {
           </DropdownMenu>
 
           {/* FLASH SALES */}
-          <Link href="/flash-sales" className="relative group text-sm font-medium pb-3 pr-1 flex items-center gap-1">
+          <Link href="/flash-sales" className={`relative group text-sm font-medium pb-3 pr-1 flex items-center gap-1 ${pathname === '/flash-sales' ? 'text-blue-600' : ''}`}>
             <Zap className="w-4 h-4 text-yellow-500" />
-            <span className="transition-all duration-300 group-hover:text-blue-600 group-hover:drop-shadow-[0_0_4px_rgba(0,123,255,0.25)]">
-              Flash Sales
-            </span>
+            <span className="transition-all duration-300 group-hover:text-blue-600 group-hover:drop-shadow-[0_0_4px_rgba(0,123,255,0.25)]">{t("nav.flashSales")}</span>
             <span
               className="
                 absolute bottom-0 right-0
@@ -117,11 +128,9 @@ export default function Navigation() {
           </Link>
 
           {/* GLOBAL */}
-          <Link href="/global" className="relative group text-sm font-medium pb-3 pr-1 flex items-center gap-1">
+          <Link href="/global" className={`relative group text-sm font-medium pb-3 pr-1 flex items-center gap-1 ${pathname === '/global' ? 'text-blue-600' : ''}`}>
             <Globe className="w-4 h-4" />
-            <span className="transition-all duration-300 group-hover:text-blue-600 group-hover:drop-shadow-[0_0_4px_rgba(0,123,255,0.25)]">
-              Global
-            </span>
+            <span className="transition-all duration-300 group-hover:text-blue-600 group-hover:drop-shadow-[0_0_4px_rgba(0,123,255,0.25)]">{t("nav.global")}</span>
             <span
               className="
                 absolute bottom-0 right-0
@@ -133,11 +142,9 @@ export default function Navigation() {
           </Link>
 
           {/* HEALTHCARE CENTER */}
-          <Link href="/healthcare-center" className="relative group text-sm font-medium pb-3 pr-1 flex items-center gap-1">
+          <Link href="/healthcare-center" className={`relative group text-sm font-medium pb-3 pr-1 flex items-center gap-1 ${pathname === '/healthcare-center' ? 'text-blue-600' : ''}`}>
             <Heart className="w-4 h-4 text-red-500" />
-            <span className="transition-all duration-300 group-hover:text-blue-600 group-hover:drop-shadow-[0_0_4px_rgba(0,123,255,0.25)]">
-              Healthcare Center
-            </span>
+            <span className="transition-all duration-300 group-hover:text-blue-600 group-hover:drop-shadow-[0_0_4px_rgba(0,123,255,0.25)]">{t("nav.healthcareCenter")}</span>
             <span
               className="
                 absolute bottom-0 right-0
@@ -150,18 +157,20 @@ export default function Navigation() {
         </div>
 
         {/* CATEGORY PILLS */}
-        <div className="pb-2 overflow-x-auto no-scrollbar">
+        <div className="pb-2 overflow-x-auto no-scrollbar relative">
           <div className="flex items-center gap-2 sm:gap-3 flex-nowrap">
-            {categories.map((cat) => (
-              <Link
-                key={cat}
-                href={`/category/${encodeURIComponent(cat)}`}
-                className="px-3 py-1.5 rounded-full border bg-white text-gray-700 hover:bg-gray-50 whitespace-nowrap text-sm"
-              >
-                {cat}
-              </Link>
-            ))}
+              {categories.map((cat) => (
+                <Link
+                  key={cat}
+                  href={`/category/${encodeURIComponent(cat)}`}
+                  className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm border ${pathname?.startsWith(`/category/${encodeURIComponent(cat)}`) ? 'bg-primary text-white border-primary hover:bg-primary/90' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                >
+                {labelFor(cat)}
+                </Link>
+              ))}
           </div>
+          <div className="hidden md:block pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white to-transparent" />
+          <div className="hidden md:block pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent" />
         </div>
       </div>
     </nav>

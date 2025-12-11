@@ -6,28 +6,31 @@ import BrandShowcase from "./components/BrandShowcase"
 import CategoriesGrid from "./components/CategoriesGrid"
 import Footer from "./components/Footer"
 import CategoryPage from "./pages/CategoryPage"
+import { I18nProvider } from "@/components/I18nProvider"
 
 export default function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-background">
-        <Header />
-        <Navigation />
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <Hero />
-                <BrandShowcase />
-                <CategoriesGrid />
-              </>
-            }
-          />
-          <Route path="/category/:name" element={<CategoryPage />} />
-        </Routes>
-        <Footer />
-      </div>
+      <I18nProvider>
+        <div className="min-h-screen bg-background">
+          <Header />
+          <Navigation />
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <>
+                  <Hero />
+                  <BrandShowcase />
+                  <CategoriesGrid />
+                </>
+              }
+            />
+            <Route path="/category/:name" element={<CategoryPage />} />
+          </Routes>
+          <Footer />
+        </div>
+      </I18nProvider>
     </Router>
   )
 }

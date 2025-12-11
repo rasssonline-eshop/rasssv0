@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import * as React from "react"
 import { useCart } from "@/components/CartProvider"
 import { Badge } from "@/components/ui/badge"
+import { useI18n } from "@/components/I18nProvider"
 
 const categoryImages: Record<string, string> = {
   Fragrances: "https://picsum.photos/seed/fragrances/600/600",
@@ -72,6 +73,7 @@ export default function CategoryPage() {
     try { return decodeURIComponent(nameRaw) } catch { return nameRaw }
   })()
   const { addItem } = useCart()
+  const { t, lang } = useI18n()
 
   const brands = ["Uriage", "Vichy", "Avene", "Bioderma", "Cerave"]
   const rngBase = seededRng(strHash(name))
@@ -112,25 +114,25 @@ export default function CategoryPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container">
         <h1 className="text-3xl font-bold mb-2">{name}</h1>
-        <p className="text-gray-600 mb-4">Showing {sorted.length} products</p>
-        <div className="flex flex-wrap items-center gap-3 mb-8">
-          <label className="text-sm text-gray-600">Sort</label>
+        <p className="text-gray-600 mb-4">{t("category.showing")} {sorted.length} {t("common.products")}</p>
+        <div className="flex flex-wrap items-center gap-3 mb-8 rounded-lg border bg-white p-3">
+          <label className="text-sm text-gray-600">{t("sort.sort")}</label>
           <select value={sort} onChange={(e) => setSort(e.target.value as any)} className="h-9 rounded-md border px-3 text-sm bg-white">
-            <option value="relevance">Relevance</option>
-            <option value="priceAsc">Price: Low to High</option>
-            <option value="priceDesc">Price: High to Low</option>
-            <option value="ratingDesc">Rating</option>
+            <option value="relevance">{t("sort.relevance")}</option>
+            <option value="priceAsc">{t("sort.priceAsc")}</option>
+            <option value="priceDesc">{t("sort.priceDesc")}</option>
+            <option value="ratingDesc">{t("sort.rating")}</option>
           </select>
-          <label className="ml-4 text-sm text-gray-600">Brand</label>
+          <label className="ml-4 text-sm text-gray-600">{t("filter.brand")}</label>
           <select value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)} className="h-9 rounded-md border px-3 text-sm bg-white">
             <option>All</option>
             {brands.map((b) => (
               <option key={b}>{b}</option>
             ))}
           </select>
-          <label className="ml-4 text-sm text-gray-600">Price</label>
+          <label className="ml-4 text-sm text-gray-600">{t("filter.price")}</label>
           <Input type="number" value={minPrice} onChange={(e) => setMinPrice(Number(e.target.value))} className="w-24 bg-white" />
-          <span className="text-sm text-gray-500">to</span>
+          <span className="text-sm text-gray-500">{t("filter.to")}</span>
           <Input type="number" value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} className="w-24 bg-white" />
         </div>
 
@@ -149,7 +151,7 @@ export default function CategoryPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                   {comingSoonCategories.has(name) && (
                     <div className="absolute top-3 left-3">
-                      <Badge variant="secondary">Coming Soon</Badge>
+                      <Badge variant="secondary">{t("badge.comingSoon")}</Badge>
                     </div>
                   )}
                   <div className="absolute bottom-3 left-3 text-white font-semibold text-sm">
@@ -159,7 +161,7 @@ export default function CategoryPage() {
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="font-semibold text-sm line-clamp-2 flex-1">{product.name}</h3>
-                    <Badge>Save {Math.max(5, Math.round(100 - (product.price / product.oldPrice) * 100))}%</Badge>
+                    <Badge>{t("badge.save")} {Math.max(5, Math.round(100 - (product.price / product.oldPrice) * 100))}%</Badge>
                   </div>
                   <div className="flex items-center gap-1 mb-3">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />

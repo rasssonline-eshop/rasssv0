@@ -3,31 +3,28 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
+import { useI18n } from "@/components/I18nProvider"
+import { useLocation } from "@/components/LocationProvider"
 import Image from "next/image"
 
-const slides = [
-  {
-    id: 1,
-    title: "Beauty & Wellness",
-    subtitle: "Made for Pakistan · Lahore delivery",
-    image: "https://picsum.photos/seed/beauty/1200/600",
-  },
-  {
-    id: 2,
-    title: "Great Prices",
-    subtitle: "Exclusive online deals every day",
-    image: "https://picsum.photos/seed/skincare/1200/600",
-  },
-  {
-    id: 3,
-    title: "Same-Day Delivery",
-    subtitle: "Available in Lahore",
-    image: "https://picsum.photos/seed/wellness/1200/600",
-  },
+const baseSlides = [
+  { id: 1, titleKey: "hero.slide1.title", subtitleKey: "hero.slide1.subtitle", image: "https://picsum.photos/seed/beauty/1200/600" },
+  { id: 2, titleKey: "hero.slide2.title", subtitleKey: "hero.slide2.subtitle", image: "https://picsum.photos/seed/skincare/1200/600" },
+  { id: 3, titleKey: "hero.slide3.title", subtitleKey: "hero.slide3.subtitle", image: "https://picsum.photos/seed/wellness/1200/600" },
 ]
 
 export default function Hero() {
   const [current, setCurrent] = useState(0)
+  const { t, lang } = useI18n()
+  const { city } = useLocation()
+  const slides = baseSlides.map((s) => ({
+    id: s.id,
+    title: t(s.titleKey),
+    subtitle: s.subtitleKey === "hero.slide3.subtitle"
+      ? (lang === 'ur' ? `صرف ${city} میں دستیاب` : `Available in ${city}`)
+      : t(s.subtitleKey),
+    image: s.image,
+  }))
 
   const next = () => setCurrent((current + 1) % slides.length)
   const prev = () => setCurrent((current - 1 + slides.length) % slides.length)

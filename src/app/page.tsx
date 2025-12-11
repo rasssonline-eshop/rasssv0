@@ -7,8 +7,10 @@ import BrandShowcase from "@/components/BrandShowcase"
 import CategoriesGrid from "@/components/CategoriesGrid"
 import Footer from "@/components/Footer"
 import Image from "next/image"
+import { useI18n } from "@/components/I18nProvider"
 
 export default function Home() {
+  const { t } = useI18n()
   return (
     <main className="bg-gray-50 min-h-screen">
       <Header />
@@ -28,14 +30,14 @@ export default function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-accent/50" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6 gap-3">
-            <h2 className="text-3xl md:text-5xl font-bold">Skin Care Deals</h2>
-            <p className="text-base md:text-xl">Made for Pakistan · Lahore delivery</p>
+            <h2 className="text-3xl md:text-5xl font-bold">{t("home.browseCategories")}</h2>
+            <p className="text-base md:text-xl">{t("home.findFast")}</p>
             <div className="flex gap-3">
               <a href="/category/Skin Care" className="inline-flex">
-                <button className="bg-white text-gray-900 hover:bg-gray-100 px-4 py-2 rounded-md text-sm md:text-base">Shop Skin Care</button>
+                <button className="bg-white text-gray-900 hover:bg-gray-100 px-4 py-2 rounded-md text-sm md:text-base">{t("home.viewCategories")}</button>
               </a>
               <a href="/flash-sales" className="inline-flex">
-                <button className="bg-primary text-white hover:bg-primary/90 px-4 py-2 rounded-md text-sm md:text-base">Shop Now</button>
+                <button className="bg-primary text-white hover:bg-primary/90 px-4 py-2 rounded-md text-sm md:text-base">{t("home.shopNow")}</button>
               </a>
             </div>
           </div>
@@ -53,14 +55,14 @@ export default function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-accent/50" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6 gap-3">
-            <h2 className="text-3xl md:text-5xl font-bold">Browse Categories</h2>
-            <p className="text-base md:text-xl">Find what you need, fast</p>
+            <h2 className="text-3xl md:text-5xl font-bold">{t("home.browseCategories")}</h2>
+            <p className="text-base md:text-xl">{t("home.findFast")}</p>
             <div className="flex gap-3">
               <a href="#categories" className="inline-flex">
-                <button className="bg-white text-gray-900 hover:bg-gray-100 px-4 py-2 rounded-md text-sm md:text-base">View Categories</button>
+                <button className="bg-white text-gray-900 hover:bg-gray-100 px-4 py-2 rounded-md text-sm md:text-base">{t("home.viewCategories")}</button>
               </a>
               <a href="/flash-sales" className="inline-flex">
-                <button className="bg-primary text-white hover:bg-primary/90 px-4 py-2 rounded-md text-sm md:text-base">Shop Now</button>
+                <button className="bg-primary text-white hover:bg-primary/90 px-4 py-2 rounded-md text-sm md:text-base">{t("home.shopNow")}</button>
               </a>
             </div>
           </div>

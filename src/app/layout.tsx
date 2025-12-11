@@ -5,6 +5,8 @@ import './globals.css'
 import MobileNav from '@/components/MobileNav'
 import CartProvider from '@/components/CartProvider'
 import CartDrawer from '@/components/CartDrawer'
+import LocationProvider from '@/components/LocationProvider'
+import { I18nProvider } from '@/components/I18nProvider'
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -43,11 +45,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans antialiased`}>
-        <CartProvider>
-          {children}
-          <CartDrawer />
-          <MobileNav />
-        </CartProvider>
+        <I18nProvider>
+          <LocationProvider>
+            <CartProvider>
+              {children}
+              <CartDrawer />
+              <MobileNav />
+            </CartProvider>
+          </LocationProvider>
+        </I18nProvider>
         <Analytics />
       </body>
     </html>

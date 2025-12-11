@@ -2,8 +2,9 @@
 
 import { useParams } from "react-router-dom"
 import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { useI18n } from "@/components/I18nProvider"
 import { Star, ShoppingCart } from "lucide-react"
 
 export default function CategoryPage() {
@@ -66,11 +67,12 @@ export default function CategoryPage() {
       image: `/placeholder.svg?height=300&width=300&query=${baseName}-product-${i}`,
     }))
 
+  const { t } = useI18n()
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container">
         <h1 className="text-3xl font-bold mb-2">{name}</h1>
-        <p className="text-gray-600 mb-6">Showing {products.length} products</p>
+        <p className="text-gray-600 mb-6">{t("category.showing")} {products.length} {t("common.products")}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((product) => (
@@ -83,7 +85,7 @@ export default function CategoryPage() {
                 />
                 {isComingSoon && (
                   <div className="absolute top-3 left-3">
-                    <Badge variant="secondary">Coming Soon</Badge>
+                    <Badge variant="secondary">{t("badge.comingSoon")}</Badge>
                   </div>
                 )}
               </div>
