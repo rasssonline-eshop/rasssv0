@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import Image from "next/image"
+import { useAdmin } from "@/components/AdminProvider"
 
 const categories = [
   {
@@ -134,7 +135,9 @@ const categoryImages: Record<string, string> = {
 }
 
 export default function CategoriesGrid() {
-  const sorted = [...categories].sort((a, b) => Number(!!a.comingSoon) - Number(!!b.comingSoon))
+  const { store } = useAdmin()
+  const adminCats = store.categories.length ? store.categories.map(c => ({ name: c.name, subcategories: c.subcategories || [], comingSoon: c.comingSoon })) : categories
+  const sorted = [...adminCats].sort((a, b) => Number(!!a.comingSoon) - Number(!!b.comingSoon))
   return (
     <section id="categories" className="py-12 bg-gray-50">
       <div className="container">
@@ -145,7 +148,7 @@ export default function CategoriesGrid() {
               <Card className="bg-white rounded-xl border overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 hover:ring-2 hover:ring-primary/30 active:scale-95 active:ring-primary/40 cursor-pointer h-full">
                 <div className="relative w-full h-48">
                   <Image
-                    src={categoryImages[category.name] || categoryImages["Skin Care"]}
+                    src={store.categories.find(x => x.name === category.name)?.image || categoryImages[category.name] || categoryImages["Skin Care"]}
                     alt={category.name}
                     fill
                     className="object-cover"

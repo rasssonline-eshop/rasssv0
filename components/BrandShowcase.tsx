@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { useI18n } from "@/components/I18nProvider"
 import Image from "next/image"
+import { useAdmin } from "@/components/AdminProvider"
 
 const brands = [
   { id: 1, name: 'Uriage', logo: 'https://picsum.photos/seed/brand-1/200/200' },
@@ -19,13 +20,14 @@ const brands = [
 
 export default function BrandShowcase() {
   const { t } = useI18n()
+  const { store } = useAdmin()
   return (
-    <section className="py-12 bg-white">
+    <section id="brands" className="py-12 bg-white">
       <div className="container">
         <h2 className="text-2xl font-bold mb-8">{t("brands.shopBy")}</h2>
         <div className="bg-gradient-to-r from-purple-900 to-purple-800 rounded-lg p-8">
           <div className="grid grid-cols-5 gap-4 md:grid-cols-10">
-            {brands.map((brand) => (
+            {(store.brands.length ? store.brands : brands).map((brand) => (
               <Card
                 key={brand.id}
                 className="bg-white/10 aspect-square relative overflow-hidden cursor-pointer hover:shadow-md transition-transform hover:-translate-y-0.5"

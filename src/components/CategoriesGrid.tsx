@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Link } from "react-router-dom"
+import { useAdmin } from "@/components/AdminProvider"
 
 const categories = [
   {
@@ -80,6 +81,7 @@ const categories = [
 ]
 
 export default function CategoriesGrid() {
+  const { store } = useAdmin()
   const imageMap: Record<string, string> = {
     Fragrances: "/fragrances.jpg",
     Makeup: "/makeup-products.png",
@@ -120,7 +122,8 @@ export default function CategoriesGrid() {
     "Hair shampoo plus conditioner": "/hair-care.jpg",
     "Slimming Tea": "/personal-care.jpg",
   }
-  const sorted = [...categories].sort((a, b) => Number(!!a.comingSoon) - Number(!!b.comingSoon))
+  const adminCats = store.categories.length ? store.categories.map(c => ({ name: c.name, subcategories: c.subcategories || [], image: c.image, comingSoon: c.comingSoon })) : categories
+  const sorted = [...adminCats].sort((a, b) => Number(!!a.comingSoon) - Number(!!b.comingSoon))
   return (
     <section className="py-12 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
@@ -130,7 +133,7 @@ export default function CategoriesGrid() {
             <Link key={category.name} to={`/category/${category.name}`}>
               <Card className="overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 hover:ring-2 hover:ring-primary/30 active:scale-95 active:ring-primary/40 cursor-pointer h-full">
                 <img
-                  src={imageMap[category.name] || category.image || "/placeholder.svg"}
+                  src={(store.categories.find(x => x.name === category.name)?.image) || imageMap[category.name] || category.image || "/placeholder.svg"}
                   alt={category.name}
                   className="w-full h-48 object-cover"
                 />

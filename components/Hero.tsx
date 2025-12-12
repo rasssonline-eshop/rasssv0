@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { useI18n } from "@/components/I18nProvider"
+import { useAdmin } from "@/components/AdminProvider"
 import { useLocation } from "@/components/LocationProvider"
 import Image from "next/image"
 
@@ -17,7 +18,9 @@ export default function Hero() {
   const [current, setCurrent] = useState(0)
   const { t, lang } = useI18n()
   const { city } = useLocation()
-  const slides = baseSlides.map((s) => ({
+  const { store } = useAdmin()
+  const base = store.slides.length ? store.slides.map(s => ({ id: s.id, titleKey: s.title, subtitleKey: s.subtitle, image: s.image })) : baseSlides
+  const slides = base.map((s) => ({
     id: s.id,
     title: t(s.titleKey),
     subtitle: s.subtitleKey === "hero.slide3.subtitle"

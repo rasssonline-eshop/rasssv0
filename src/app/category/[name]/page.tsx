@@ -12,6 +12,7 @@ import * as React from "react"
 import { useCart } from "@/components/CartProvider"
 import { Badge } from "@/components/ui/badge"
 import { useI18n } from "@/components/I18nProvider"
+import { useAdmin } from "@/components/AdminProvider"
 
 const categoryImages: Record<string, string> = {
   Fragrances: "https://picsum.photos/seed/fragrances/600/600",
@@ -74,10 +75,12 @@ export default function CategoryPage() {
   })()
   const { addItem } = useCart()
   const { t, lang } = useI18n()
+  const { store } = useAdmin()
 
   const brands = ["Uriage", "Vichy", "Avene", "Bioderma", "Cerave"]
   const rngBase = seededRng(strHash(name))
-  const products = Array(12)
+  const adminProds = store.productsByCategory[name]
+  const products = (adminProds && adminProds.length ? adminProds.map((p, i) => ({ id: p.id || String(i), name: p.name, slug: p.slug || `${name.toLowerCase().replace(/\s+/g, '-')}-product-${i + 1}`, price: p.price, rating: String(p.rating ?? 4.2), brand: p.brand || 'Rasss', oldPrice: p.oldPrice })) : Array(12))
     .fill(null)
     .map((_, i) => ({
       id: i,

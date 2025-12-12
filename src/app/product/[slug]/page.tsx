@@ -54,6 +54,25 @@ function seededRng(seed: number) {
 }
 
 function getProduct(slug: string): Product {
+  try {
+    const raw = localStorage.getItem('adminStore')
+    if (raw) {
+      const store = JSON.parse(raw)
+      for (const list of Object.values(store.productsByCategory || {})) {
+        const found = (list as any[]).find(p => p.slug === slug)
+        if (found) return {
+          slug: found.slug || slug,
+          name: found.name,
+          brand: found.brand || 'Rasss',
+          price: found.price,
+          oldPrice: found.oldPrice,
+          rating: found.rating || 4.3,
+          tags: ['Skin Care'],
+          image: found.image || "https://picsum.photos/seed/product-1/800/800",
+        }
+      }
+    }
+  } catch {}
   if (sampleCatalog[slug]) return sampleCatalog[slug]
   const rng = seededRng(strHash(slug))
   const price = Math.floor(rng() * 180) + 20
