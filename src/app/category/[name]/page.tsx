@@ -145,7 +145,7 @@ export default function CategoryPage() {
               <Card className="bg-white rounded-xl border overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 hover:ring-2 hover:ring-primary/30 active:scale-95 active:ring-primary/40">
                 <div className="relative aspect-square overflow-hidden">
                   <Image
-                    src={categoryImages[name] || categoryImages["Skin Care"]}
+                    src={(adminProds && adminProds.length ? (adminProds.find(x => (x.slug || x.name.toLowerCase().replace(/\s+/g, '-')) === product.slug)?.image || '') : '') || categoryImages[name] || categoryImages["Skin Care"]}
                     alt={product.name}
                     fill
                     className="object-cover"
