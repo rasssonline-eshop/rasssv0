@@ -31,6 +31,17 @@ const defaultStore = {
   brands: [
     { id: "Rasss", name: "Rasss", logo: "https://picsum.photos/seed/brand-rasss/200/200" },
   ],
+  inventory: [
+    { id: "m1", productId: "Skin Care:Demo Cream", productName: "Demo Cream", type: "in", qty: 50, unit: "pcs", note: "Initial stock", date: new Date().toISOString() },
+  ],
+  orders: [
+    { id: "o1", status: "pending", items: [{ productId: "Skin Care:Demo Cream", name: "Demo Cream", qty: 2, price: 1499 }], total: 2998, placedAt: new Date().toISOString(), note: "Demo order" },
+  ],
+  ledger: [
+    { id: "l1", type: "income", amount: 2998, note: "Demo sale", date: new Date().toISOString() },
+    { id: "l2", type: "expense", amount: 500, note: "Packaging", date: new Date().toISOString() },
+  ],
+  accountant: { name: "Demo Accountant", email: "accounting@example.com", phone: "+92-300-0000000", notes: "Monthly audit on 28th", lastAuditDate: new Date().toISOString().slice(0,10) },
 }
 
 function ensureDir() {

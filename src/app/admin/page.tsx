@@ -12,7 +12,7 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Eye, Trash, ClipboardCopy, RefreshCw, Home, Grid2X2, Image as ImageIcon, Tags, Settings } from 'lucide-react'
+import { Plus, Eye, Trash, ClipboardCopy, RefreshCw, Home, Grid2X2, Image as ImageIcon, Tags, Settings, TrendingUp, TrendingDown, User, ClipboardList } from 'lucide-react'
 
 function AdminGate({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState(false)
@@ -343,15 +343,175 @@ export default function AdminDashboardPage() {
             <TabsTrigger value="products" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Products</TabsTrigger>
             <TabsTrigger value="slides" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Slides</TabsTrigger>
             <TabsTrigger value="brands" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Brands</TabsTrigger>
+            <TabsTrigger value="inventory" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Inventory</TabsTrigger>
+            <TabsTrigger value="orders" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Orders</TabsTrigger>
+            <TabsTrigger value="accounting" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Accounting</TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="categories"><CategoriesTab /></TabsContent>
           <TabsContent value="products"><ProductsTab /></TabsContent>
           <TabsContent value="slides"><SlidesTab /></TabsContent>
           <TabsContent value="brands"><BrandsTab /></TabsContent>
+          <TabsContent value="inventory"><InventoryTab /></TabsContent>
+          <TabsContent value="orders"><OrdersTab /></TabsContent>
+          <TabsContent value="accounting"><AccountingTab /></TabsContent>
           <TabsContent value="settings"><SettingsTab /></TabsContent>
         </Tabs>
       </div>
     </AdminGate>
+  )
+}
+
+function InventoryTab() {
+  const { store, addMovement, removeMovement } = useAdmin()
+  const [productId, setProductId] = useState('')
+  const [type, setType] = useState<'in'|'out'>('in')
+  const [qty, setQty] = useState('')
+  const [unit, setUnit] = useState('pcs')
+  const [note, setNote] = useState('')
+  const productOpts = Object.entries(store.productsByCategory).flatMap(([cat, list]) => list.map(p => ({ id: p.id, name: p.name })))
+  const incoming = store.inventory.filter(i => i.type==='in').reduce((a,b)=>a+b.qty,0)
+  const outgoing = store.inventory.filter(i => i.type==='out').reduce((a,b)=>a+b.qty,0)
+  return (
+    <div className="space-y-4">
+      <Card className="p-4 grid grid-cols-1 md:grid-cols-5 gap-2">
+        <Select value={productId} onValueChange={setProductId}>
+          <SelectTrigger className="w-full"><SelectValue placeholder="Select product" /></SelectTrigger>
+          <SelectContent>
+            {productOpts.map(p => (<SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>))}
+          </SelectContent>
+        </Select>
+        <Select value={type} onValueChange={v=>setType(v as any)}>
+          <SelectTrigger className="w-full"><SelectValue placeholder="Type" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="in">Incoming</SelectItem>
+            <SelectItem value="out">Outgoing</SelectItem>
+          </SelectContent>
+        </Select>
+        <Input type="number" placeholder="Qty" value={qty} onChange={e=>setQty(e.target.value)} />
+        <Input placeholder="Unit" value={unit} onChange={e=>setUnit(e.target.value)} />
+        <Input placeholder="Note" value={note} onChange={e=>setNote(e.target.value)} />
+        <Button onClick={() => { if (!productId || !qty) return; const prod = productOpts.find(p=>p.id===productId)!; addMovement({ id: `${Date.now()}`, productId, productName: prod.name, type, qty: Number(qty), unit, note, date: new Date().toISOString() }); toast.success('Movement recorded'); setProductId(''); setQty(''); setNote('') }}>Add</Button>
+      </Card>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Card className="p-4"><div className="text-xs">Incoming</div><div className="text-2xl font-bold flex items-center gap-2 text-green-600"><TrendingDown className="w-5 h-5" /> {incoming}</div></Card>
+        <Card className="p-4"><div className="text-xs">Outgoing</div><div className="text-2xl font-bold flex items-center gap-2 text-red-600"><TrendingUp className="w-5 h-5" /> {outgoing}</div></Card>
+      </div>
+      <div className="space-y-2">
+        {store.inventory.slice().reverse().map(m => (
+          <Card key={m.id} className="p-3 flex items-center gap-2">
+            <div className="flex-1">
+              <div className="font-semibold text-sm">{m.productName}</div>
+              <div className="text-xs text-gray-600">{m.type.toUpperCase()} · {m.qty} {m.unit} · {new Date(m.date).toLocaleString()}</div>
+            </div>
+            <div className={`px-2 py-1 rounded text-xs ${m.type==='in' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{m.type}</div>
+            <Button variant="outline" onClick={() => { removeMovement(m.id); toast.success('Removed') }}>
+              <Trash className="w-4 h-4 mr-1" /> Remove
+            </Button>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function OrdersTab() {
+  const { store, upsertOrder, removeOrder } = useAdmin()
+  const [items, setItems] = useState<{ productId: string, qty: number }[]>([])
+  const [note, setNote] = useState('')
+  const productOpts = Object.entries(store.productsByCategory).flatMap(([cat, list]) => list.map(p => ({ id: p.id, name: p.name, price: p.price })))
+  const addItem = () => { const p = productOpts[0]; if (!p) return; setItems([...items, { productId: p.id, qty: 1 }]) }
+  const total = items.reduce((a, it) => { const p = productOpts.find(x=>x.id===it.productId); return a + (p ? p.price * it.qty : 0) }, 0)
+  return (
+    <div className="space-y-4">
+      <Card className="p-4 space-y-2">
+        <div className="flex flex-col gap-2">
+          {items.map((it, idx) => (
+            <div key={idx} className="flex items-center gap-2">
+              <Select value={it.productId} onValueChange={v => { const next = items.slice(); next[idx] = { ...next[idx], productId: v }; setItems(next) }}>
+                <SelectTrigger className="w-64"><SelectValue placeholder="Product" /></SelectTrigger>
+                <SelectContent>
+                  {productOpts.map(p => (<SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>))}
+                </SelectContent>
+              </Select>
+              <Input type="number" className="w-24" value={String(it.qty)} onChange={e => { const next = items.slice(); next[idx] = { ...next[idx], qty: Number(e.target.value||'0') }; setItems(next) }} />
+              <Button variant="outline" onClick={() => { const next = items.slice(); next.splice(idx,1); setItems(next) }}>Remove</Button>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <Button onClick={() => addItem()}><ClipboardList className="w-4 h-4 mr-1" /> Add Item</Button>
+          <Input placeholder="Note" value={note} onChange={e=>setNote(e.target.value)} />
+          <div className="ml-auto font-bold">Total: {total}</div>
+          <Button onClick={() => { const id = `o-${Date.now()}`; const itemsFull = items.map(it => { const p = productOpts.find(x=>x.id===it.productId)!; return { productId: p.id, name: p.name, qty: it.qty, price: p.price } }); upsertOrder({ id, status: 'pending', items: itemsFull, total, placedAt: new Date().toISOString(), note }); toast.success('Order created'); setItems([]); setNote('') }}>Create Order</Button>
+        </div>
+      </Card>
+      <div className="space-y-2">
+        {store.orders.slice().reverse().map(o => (
+          <Card key={o.id} className="p-3">
+            <div className="flex items-center justify-between">
+              <div className="font-semibold">Order {o.id}</div>
+              <div className="text-sm">{new Date(o.placedAt).toLocaleString()}</div>
+            </div>
+            <div className="text-sm text-gray-600">Status: {o.status} · Items: {o.items.length} · Total: {o.total}</div>
+            <div className="mt-2 flex items-center gap-2">
+              <Button variant="outline" onClick={() => { removeOrder(o.id); toast.success('Order removed') }}>Remove</Button>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function AccountingTab() {
+  const { store, addLedger, removeLedger, setAccountant } = useAdmin()
+  const [name, setName] = useState(store.accountant?.name || '')
+  const [email, setEmail] = useState(store.accountant?.email || '')
+  const [phone, setPhone] = useState(store.accountant?.phone || '')
+  const [notes, setNotes] = useState(store.accountant?.notes || '')
+  const [amount, setAmount] = useState('')
+  const [type, setType] = useState<'income'|'expense'>('income')
+  const income = store.ledger.filter(l=>l.type==='income').reduce((a,b)=>a+b.amount,0)
+  const expense = store.ledger.filter(l=>l.type==='expense').reduce((a,b)=>a+b.amount,0)
+  const net = income - expense
+  return (
+    <div className="space-y-4">
+      <Card className="p-4 flex items-center gap-2">
+        <div className="flex items-center gap-2">
+          <User className="w-5 h-5" />
+          <Input placeholder="Name" value={name} onChange={e=>setName(e.target.value)} />
+          <Input placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} />
+          <Input placeholder="Phone" value={phone} onChange={e=>setPhone(e.target.value)} />
+          <Input placeholder="Notes" value={notes} onChange={e=>setNotes(e.target.value)} />
+          <Button onClick={() => { setAccountant({ name, email, phone, notes, lastAuditDate: new Date().toISOString().slice(0,10) }); toast.success('Accountant updated') }}>Save</Button>
+        </div>
+      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <Card className="p-4"><div className="text-xs">Income</div><div className="text-2xl font-bold text-green-600">{income}</div></Card>
+        <Card className="p-4"><div className="text-xs">Expense</div><div className="text-2xl font-bold text-red-600">{expense}</div></Card>
+        <Card className="p-4"><div className="text-xs">Net</div><div className="text-2xl font-bold">{net}</div></Card>
+      </div>
+      <Card className="p-4 grid grid-cols-1 md:grid-cols-4 gap-2">
+        <Select value={type} onValueChange={v=>setType(v as any)}>
+          <SelectTrigger className="w-full"><SelectValue placeholder="Type" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="income">Income</SelectItem>
+            <SelectItem value="expense">Expense</SelectItem>
+          </SelectContent>
+        </Select>
+        <Input type="number" placeholder="Amount" value={amount} onChange={e=>setAmount(e.target.value)} />
+        <Input placeholder="Note" />
+        <Button onClick={() => { if (!amount) return; addLedger({ id: `${Date.now()}`, type, amount: Number(amount), date: new Date().toISOString() }); toast.success('Ledger added'); setAmount('') }}>Add</Button>
+      </Card>
+      <div className="space-y-2">
+        {store.ledger.slice().reverse().map(l => (
+          <Card key={l.id} className="p-3 flex items-center gap-2">
+            <div className="flex-1 text-sm">{new Date(l.date).toLocaleString()} · {l.type} · {l.amount}</div>
+            <Button variant="outline" onClick={() => { removeLedger(l.id); toast.success('Removed') }}>Remove</Button>
+          </Card>
+        ))}
+      </div>
+    </div>
   )
 }

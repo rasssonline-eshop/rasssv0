@@ -24,11 +24,21 @@ export type AdminProduct = {
 export type AdminSlide = { id: string, title: string, subtitle: string, image: string }
 export type AdminBrand = { id: string, name: string, logo: string }
 
+export type InventoryMovement = { id: string, productId: string, productName: string, type: 'in' | 'out', qty: number, unit?: string, note?: string, date: string }
+export type OrderItem = { productId: string, name: string, qty: number, price: number }
+export type Order = { id: string, status: 'pending' | 'paid' | 'shipped' | 'cancelled', items: OrderItem[], total: number, placedAt: string, note?: string }
+export type LedgerEntry = { id: string, type: 'income' | 'expense', amount: number, note?: string, date: string }
+export type Accountant = { name: string, email?: string, phone?: string, notes?: string, lastAuditDate?: string }
+
 type AdminStore = {
   categories: AdminCategory[]
   productsByCategory: Record<string, AdminProduct[]>
   slides: AdminSlide[]
   brands: AdminBrand[]
+  inventory: InventoryMovement[]
+  orders: Order[]
+  ledger: LedgerEntry[]
+  accountant?: Accountant
 }
 
 type AdminContextValue = {
@@ -46,6 +56,13 @@ type AdminContextValue = {
   removeBrand: (id: string) => void
   importJson: (json: AdminStore) => void
   exportJson: () => string
+  addMovement: (m: InventoryMovement) => void
+  removeMovement: (id: string) => void
+  upsertOrder: (o: Order) => void
+  removeOrder: (id: string) => void
+  addLedger: (e: LedgerEntry) => void
+  removeLedger: (id: string) => void
+  setAccountant: (a: Accountant) => void
 }
 
 const defaultStore: AdminStore = {
@@ -53,6 +70,10 @@ const defaultStore: AdminStore = {
   productsByCategory: {},
   slides: [],
   brands: [],
+  inventory: [],
+  orders: [],
+  ledger: [],
+  accountant: undefined,
 }
 
 const AdminContext = React.createContext<AdminContextValue | null>(null)
@@ -146,6 +167,35 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     setStore(s)
   }
 
+  const addMovement = (m: InventoryMovement) => {
+    const s = { ...store, inventory: [...store.inventory, m] }
+    setStore(s)
+  }
+  const removeMovement = (id: string) => {
+    const s = { ...store, inventory: store.inventory.filter(x => x.id !== id) }
+    setStore(s)
+  }
+  const upsertOrder = (o: Order) => {
+    const s = { ...store, orders: [...store.orders.filter(x => x.id !== o.id), o] }
+    setStore(s)
+  }
+  const removeOrder = (id: string) => {
+    const s = { ...store, orders: store.orders.filter(x => x.id !== id) }
+    setStore(s)
+  }
+  const addLedger = (e: LedgerEntry) => {
+    const s = { ...store, ledger: [...store.ledger, e] }
+    setStore(s)
+  }
+  const removeLedger = (id: string) => {
+    const s = { ...store, ledger: store.ledger.filter(x => x.id !== id) }
+    setStore(s)
+  }
+  const setAccountant = (a: Accountant) => {
+    const s = { ...store, accountant: a }
+    setStore(s)
+  }
+
   const importJson = (json: AdminStore) => setStore(json)
   const exportJson = () => JSON.stringify(store, null, 2)
 
@@ -164,6 +214,13 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     removeBrand,
     importJson,
     exportJson,
+    addMovement,
+    removeMovement,
+    upsertOrder,
+    removeOrder,
+    addLedger,
+    removeLedger,
+    setAccountant,
   }
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>
 }
