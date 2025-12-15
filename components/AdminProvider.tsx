@@ -26,9 +26,13 @@ export type AdminBrand = { id: string, name: string, logo: string }
 
 export type InventoryMovement = { id: string, productId: string, productName: string, type: 'in' | 'out', qty: number, unit?: string, note?: string, date: string }
 export type OrderItem = { productId: string, name: string, qty: number, price: number }
-export type Order = { id: string, status: 'pending' | 'paid' | 'shipped' | 'cancelled', items: OrderItem[], total: number, placedAt: string, note?: string }
+export type Order = { id: string, status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled', items: OrderItem[], total: number, placedAt: string, note?: string }
 export type LedgerEntry = { id: string, type: 'income' | 'expense', amount: number, note?: string, date: string }
 export type Accountant = { name: string, email?: string, phone?: string, notes?: string, lastAuditDate?: string }
+export type Supplier = { id: string, name: string, email?: string, phone?: string }
+export type PurchaseOrderItem = { productId: string, name: string, qty: number, unitCost: number }
+export type PurchaseOrder = { id: string, supplierId: string, items: PurchaseOrderItem[], total: number, status: 'draft' | 'ordered' | 'received' | 'cancelled', createdAt: string, note?: string }
+export type Invoice = { id: string, orderId: string, amount: number, status: 'unpaid' | 'paid' | 'refunded', issuedAt: string }
 
 type AdminStore = {
   categories: AdminCategory[]
@@ -39,6 +43,9 @@ type AdminStore = {
   orders: Order[]
   ledger: LedgerEntry[]
   accountant?: Accountant
+  suppliers: Supplier[]
+  purchaseOrders: PurchaseOrder[]
+  invoices: Invoice[]
 }
 
 type AdminContextValue = {
@@ -63,6 +70,12 @@ type AdminContextValue = {
   addLedger: (e: LedgerEntry) => void
   removeLedger: (id: string) => void
   setAccountant: (a: Accountant) => void
+  upsertSupplier: (s: Supplier) => void
+  removeSupplier: (id: string) => void
+  upsertPurchaseOrder: (po: PurchaseOrder) => void
+  removePurchaseOrder: (id: string) => void
+  upsertInvoice: (inv: Invoice) => void
+  removeInvoice: (id: string) => void
 }
 
 const defaultStore: AdminStore = {
@@ -74,6 +87,9 @@ const defaultStore: AdminStore = {
   orders: [],
   ledger: [],
   accountant: undefined,
+  suppliers: [],
+  purchaseOrders: [],
+  invoices: [],
 }
 
 const AdminContext = React.createContext<AdminContextValue | null>(null)
@@ -196,6 +212,31 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     setStore(s)
   }
 
+  const upsertSupplier = (spp: Supplier) => {
+    const s = { ...store, suppliers: [...store.suppliers.filter(x => x.id !== spp.id), spp] }
+    setStore(s)
+  }
+  const removeSupplier = (id: string) => {
+    const s = { ...store, suppliers: store.suppliers.filter(x => x.id !== id) }
+    setStore(s)
+  }
+  const upsertPurchaseOrder = (po: PurchaseOrder) => {
+    const s = { ...store, purchaseOrders: [...store.purchaseOrders.filter(x => x.id !== po.id), po] }
+    setStore(s)
+  }
+  const removePurchaseOrder = (id: string) => {
+    const s = { ...store, purchaseOrders: store.purchaseOrders.filter(x => x.id !== id) }
+    setStore(s)
+  }
+  const upsertInvoice = (inv: Invoice) => {
+    const s = { ...store, invoices: [...store.invoices.filter(x => x.id !== inv.id), inv] }
+    setStore(s)
+  }
+  const removeInvoice = (id: string) => {
+    const s = { ...store, invoices: store.invoices.filter(x => x.id !== id) }
+    setStore(s)
+  }
+
   const importJson = (json: AdminStore) => setStore(json)
   const exportJson = () => JSON.stringify(store, null, 2)
 
@@ -221,6 +262,12 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     addLedger,
     removeLedger,
     setAccountant,
+    upsertSupplier,
+    removeSupplier,
+    upsertPurchaseOrder,
+    removePurchaseOrder,
+    upsertInvoice,
+    removeInvoice,
   }
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>
 }

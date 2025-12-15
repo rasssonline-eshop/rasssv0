@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import fs from "fs"
 import path from "path"
+import { put, list } from "@vercel/blob"
 
 export const runtime = "nodejs"
 
@@ -42,6 +43,15 @@ const defaultStore = {
     { id: "l2", type: "expense", amount: 500, note: "Packaging", date: new Date().toISOString() },
   ],
   accountant: { name: "Demo Accountant", email: "accounting@example.com", phone: "+92-300-0000000", notes: "Monthly audit on 28th", lastAuditDate: new Date().toISOString().slice(0,10) },
+  suppliers: [
+    { id: "sup1", name: "Supplier One", email: "supplier1@example.com", phone: "+92-300-1111111" },
+  ],
+  purchaseOrders: [
+    { id: "po1", supplierId: "sup1", items: [{ productId: "Skin Care:Demo Cream", name: "Demo Cream", qty: 20, unitCost: 600 }], total: 12000, status: "ordered", createdAt: new Date().toISOString(), note: "Initial order" },
+  ],
+  invoices: [
+    { id: "inv1", orderId: "o1", amount: 2998, status: "unpaid", issuedAt: new Date().toISOString() },
+  ],
 }
 
 function ensureDir() {
@@ -49,6 +59,14 @@ function ensureDir() {
 }
 
 export async function GET() {
+  try {
+    const { blobs } = await list({ prefix: "admin/store.json" })
+    const b = blobs.find(x => x.pathname === "admin/store.json") || blobs[0]
+    if (b) {
+      const r = await fetch((b as any).downloadUrl || b.url)
+      if (r.ok) { const json = await r.json(); return NextResponse.json(json) }
+    }
+  } catch {}
   try {
     ensureDir()
     if (!fs.existsSync(dataFile)) return NextResponse.json(defaultStore)
@@ -66,9 +84,17 @@ export async function POST(req: NextRequest) {
     const required = process.env.ADMIN_TOKEN
     if (required && token !== required) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
     const body = await req.json()
-    ensureDir()
-    fs.writeFileSync(dataFile, JSON.stringify(body, null, 2), "utf8")
-    return NextResponse.json({ ok: true })
+    try {
+      await put("admin/store.json", JSON.stringify(body), { access: "public", contentType: "application/json", addRandomSuffix: false })
+      return NextResponse.json({ ok: true })
+    } catch {}
+    try {
+      ensureDir()
+      fs.writeFileSync(dataFile, JSON.stringify(body, null, 2), "utf8")
+      return NextResponse.json({ ok: true })
+    } catch {
+      return NextResponse.json({ error: "bad_request" }, { status: 400 })
+    }
   } catch {
     return NextResponse.json({ error: "bad_request" }, { status: 400 })
   }

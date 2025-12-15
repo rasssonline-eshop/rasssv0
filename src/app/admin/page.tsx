@@ -1,6 +1,7 @@
 "use client"
 
 import { useAdmin } from '@/components/AdminProvider'
+import type { AdminProduct } from '@/components/AdminProvider'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,7 +13,7 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Eye, Trash, ClipboardCopy, RefreshCw, Home, Grid2X2, Image as ImageIcon, Tags, Settings, TrendingUp, TrendingDown, User, ClipboardList } from 'lucide-react'
+import { Plus, Eye, Trash, ClipboardCopy, RefreshCw, Home, Grid2X2, Image as ImageIcon, Tags, Settings, TrendingUp, TrendingDown, User, ClipboardList, Building2, FileText } from 'lucide-react'
 
 function AdminGate({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState(false)
@@ -160,11 +161,11 @@ function ProductsTab() {
         </div>
       </Card>
       <div className="space-y-2">
-        {Object.entries(store.productsByCategory).map(([cat, list]) => (
+        {(Object.entries(store.productsByCategory) as [string, AdminProduct[]][]).map(([cat, list]) => (
           <Card key={cat} className="p-4">
             <div className="font-semibold mb-2">{cat}</div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {list.map(p => (
+              {list.map((p: AdminProduct) => (
                 <Card key={p.id} className="p-3 flex items-center gap-2">
                   <div className="flex-1">
                     <div className="font-medium text-sm">{p.name}</div>
@@ -281,7 +282,7 @@ function SettingsTab() {
         <Textarea placeholder="Paste JSON here" value={raw} onChange={e => setRaw(e.target.value)} className="min-h-32" />
         <div className="flex items-center gap-2">
           <Button onClick={() => { try { importJson(JSON.parse(raw)); toast.success('Imported'); setRaw('') } catch { toast.error('Invalid JSON') } }}>Import</Button>
-          <Button variant="outline" onClick={() => { const ok = confirm('Reset all admin data?'); if (!ok) return; setStore({ categories: [], productsByCategory: {}, slides: [], brands: [] }); toast.success('Reset complete') }}>Reset</Button>
+          <Button variant="outline" onClick={() => { const ok = confirm('Reset all admin data?'); if (!ok) return; setStore({ categories: [], productsByCategory: {}, slides: [], brands: [], inventory: [], orders: [], ledger: [], accountant: undefined, suppliers: [], purchaseOrders: [], invoices: [] }); toast.success('Reset complete') }}>Reset</Button>
           <Button variant="ghost" onClick={() => { try { sessionStorage.removeItem('adminAuthed') } catch {}; location.assign('/admin') }}>Sign out</Button>
         </div>
         <div className="text-xs text-gray-600">Categories: {store.categories.length} · Products: {Object.values(store.productsByCategory).reduce((a,b)=>a+b.length,0)} · Slides: {store.slides.length} · Brands: {store.brands.length}</div>
@@ -344,7 +345,10 @@ export default function AdminDashboardPage() {
             <TabsTrigger value="slides" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Slides</TabsTrigger>
             <TabsTrigger value="brands" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Brands</TabsTrigger>
             <TabsTrigger value="inventory" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Inventory</TabsTrigger>
+            <TabsTrigger value="suppliers" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Suppliers</TabsTrigger>
+            <TabsTrigger value="purchases" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Purchases</TabsTrigger>
             <TabsTrigger value="orders" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Orders</TabsTrigger>
+            <TabsTrigger value="invoices" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Invoices</TabsTrigger>
             <TabsTrigger value="accounting" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Accounting</TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Settings</TabsTrigger>
           </TabsList>
@@ -353,7 +357,10 @@ export default function AdminDashboardPage() {
           <TabsContent value="slides"><SlidesTab /></TabsContent>
           <TabsContent value="brands"><BrandsTab /></TabsContent>
           <TabsContent value="inventory"><InventoryTab /></TabsContent>
+          <TabsContent value="suppliers"><SuppliersTab /></TabsContent>
+          <TabsContent value="purchases"><PurchasesTab /></TabsContent>
           <TabsContent value="orders"><OrdersTab /></TabsContent>
+          <TabsContent value="invoices"><InvoicesTab /></TabsContent>
           <TabsContent value="accounting"><AccountingTab /></TabsContent>
           <TabsContent value="settings"><SettingsTab /></TabsContent>
         </Tabs>
@@ -369,7 +376,7 @@ function InventoryTab() {
   const [qty, setQty] = useState('')
   const [unit, setUnit] = useState('pcs')
   const [note, setNote] = useState('')
-  const productOpts = Object.entries(store.productsByCategory).flatMap(([cat, list]) => list.map(p => ({ id: p.id, name: p.name })))
+  const productOpts = (Object.entries(store.productsByCategory) as [string, AdminProduct[]][]) .flatMap(([cat, list]) => list.map((p: AdminProduct) => ({ id: p.id, name: p.name })))
   const incoming = store.inventory.filter(i => i.type==='in').reduce((a,b)=>a+b.qty,0)
   const outgoing = store.inventory.filter(i => i.type==='out').reduce((a,b)=>a+b.qty,0)
   return (
@@ -419,7 +426,7 @@ function OrdersTab() {
   const { store, upsertOrder, removeOrder } = useAdmin()
   const [items, setItems] = useState<{ productId: string, qty: number }[]>([])
   const [note, setNote] = useState('')
-  const productOpts = Object.entries(store.productsByCategory).flatMap(([cat, list]) => list.map(p => ({ id: p.id, name: p.name, price: p.price })))
+  const productOpts = (Object.entries(store.productsByCategory) as [string, AdminProduct[]][]) .flatMap(([cat, list]) => list.map((p: AdminProduct) => ({ id: p.id, name: p.name, price: p.price })))
   const addItem = () => { const p = productOpts[0]; if (!p) return; setItems([...items, { productId: p.id, qty: 1 }]) }
   const total = items.reduce((a, it) => { const p = productOpts.find(x=>x.id===it.productId); return a + (p ? p.price * it.qty : 0) }, 0)
   return (
@@ -455,8 +462,152 @@ function OrdersTab() {
             </div>
             <div className="text-sm text-gray-600">Status: {o.status} · Items: {o.items.length} · Total: {o.total}</div>
             <div className="mt-2 flex items-center gap-2">
+              <Select value={o.status} onValueChange={v => { upsertOrder({ ...o, status: v as any }); toast.success('Status updated') }}>
+                <SelectTrigger className="w-40"><SelectValue placeholder="Status" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="shipped">Shipped</SelectItem>
+                  <SelectItem value="delivered">Delivered</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
               <Button variant="outline" onClick={() => { removeOrder(o.id); toast.success('Order removed') }}>Remove</Button>
             </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function SuppliersTab() {
+  const { store, upsertSupplier, removeSupplier } = useAdmin() as any
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  return (
+    <div className="space-y-4">
+      <Card className="p-4 flex items-center gap-2">
+        <Input placeholder="Name" value={name} onChange={e=>setName(e.target.value)} />
+        <Input placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} />
+        <Input placeholder="Phone" value={phone} onChange={e=>setPhone(e.target.value)} />
+        <Button onClick={() => { if (!name) return; const id = `sup-${Date.now()}`; upsertSupplier({ id, name, email, phone }); toast.success('Supplier added'); setName(''); setEmail(''); setPhone('') }}>
+          <Building2 className="w-4 h-4 mr-1" /> Add Supplier
+        </Button>
+      </Card>
+      <div className="space-y-2">
+        {store.suppliers?.map((s: any) => (
+          <Card key={s.id} className="p-3 flex items-center gap-2">
+            <div className="flex-1 text-sm">{s.name} · {s.email} · {s.phone}</div>
+            <Button variant="outline" onClick={() => { removeSupplier(s.id); toast.success('Removed') }}>Remove</Button>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function PurchasesTab() {
+  const { store, upsertPurchaseOrder, removePurchaseOrder } = useAdmin() as any
+  const supplierOpts = store.suppliers || []
+  const productOpts = (Object.entries(store.productsByCategory) as [string, AdminProduct[]][]) .flatMap(([cat, list]) => list.map((p: AdminProduct) => ({ id: p.id, name: p.name, price: p.price })))
+  const [supplierId, setSupplierId] = useState('')
+  const [items, setItems] = useState<{ productId: string, qty: number, unitCost: number }[]>([])
+  const total = items.reduce((a, it) => a + (it.qty * it.unitCost), 0)
+  return (
+    <div className="space-y-4">
+      <Card className="p-4 space-y-2">
+        <div className="flex items-center gap-2">
+          <Select value={supplierId} onValueChange={setSupplierId}>
+            <SelectTrigger className="w-64"><SelectValue placeholder="Supplier" /></SelectTrigger>
+            <SelectContent>
+              {supplierOpts.map((s:any)=> (<SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>))}
+            </SelectContent>
+          </Select>
+          <Button onClick={() => { const p = productOpts[0]; if (!p) return; setItems([...items, { productId: p.id, qty: 1, unitCost: p.price }]) }}>
+            <ClipboardList className="w-4 h-4 mr-1" /> Add Line
+          </Button>
+        </div>
+        <div className="flex flex-col gap-2">
+          {items.map((it, idx) => (
+            <div key={idx} className="flex items-center gap-2">
+              <Select value={it.productId} onValueChange={v => { const next = items.slice(); next[idx] = { ...next[idx], productId: v }; setItems(next) }}>
+                <SelectTrigger className="w-64"><SelectValue placeholder="Product" /></SelectTrigger>
+                <SelectContent>
+                  {productOpts.map(p => (<SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>))}
+                </SelectContent>
+              </Select>
+              <Input type="number" className="w-24" value={String(it.qty)} onChange={e => { const next = items.slice(); next[idx] = { ...next[idx], qty: Number(e.target.value||'0') }; setItems(next) }} />
+              <Input type="number" className="w-32" value={String(it.unitCost)} onChange={e => { const next = items.slice(); next[idx] = { ...next[idx], unitCost: Number(e.target.value||'0') }; setItems(next) }} />
+              <Button variant="outline" onClick={() => { const next = items.slice(); next.splice(idx,1); setItems(next) }}>Remove</Button>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="ml-auto font-bold">Total: {total}</div>
+          <Button onClick={() => { if (!supplierId || items.length===0) return; const id = `po-${Date.now()}`; const poItems = items.map(it => ({ productId: it.productId, name: productOpts.find(x=>x.id===it.productId)?.name || '', qty: it.qty, unitCost: it.unitCost })); upsertPurchaseOrder({ id, supplierId, items: poItems, total, status: 'ordered', createdAt: new Date().toISOString() }); toast.success('Purchase order created'); setSupplierId(''); setItems([]) }}>Create PO</Button>
+        </div>
+      </Card>
+      <div className="space-y-2">
+        {store.purchaseOrders?.slice().reverse().map((po:any) => (
+          <Card key={po.id} className="p-3">
+            <div className="flex items-center justify-between">
+              <div className="font-semibold">PO {po.id}</div>
+              <div className="text-sm">{new Date(po.createdAt).toLocaleString()}</div>
+            </div>
+            <div className="text-sm text-gray-600">Supplier: {supplierOpts.find((s:any)=>s.id===po.supplierId)?.name || po.supplierId} · Items: {po.items.length} · Total: {po.total} · Status: {po.status}</div>
+            <div className="mt-2 flex items-center gap-2">
+              <Select value={po.status} onValueChange={v => { upsertPurchaseOrder({ ...po, status: v as any }); toast.success('Status updated') }}>
+                <SelectTrigger className="w-40"><SelectValue placeholder="Status" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="ordered">Ordered</SelectItem>
+                  <SelectItem value="received">Received</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" onClick={() => { removePurchaseOrder(po.id); toast.success('Removed') }}>Remove</Button>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function InvoicesTab() {
+  const { store, upsertInvoice, removeInvoice } = useAdmin() as any
+  const orderOpts = store.orders || []
+  const [orderId, setOrderId] = useState('')
+  const [amount, setAmount] = useState('')
+  return (
+    <div className="space-y-4">
+      <Card className="p-4 flex items-center gap-2">
+        <Select value={orderId} onValueChange={setOrderId}>
+          <SelectTrigger className="w-64"><SelectValue placeholder="Order" /></SelectTrigger>
+          <SelectContent>
+            {orderOpts.map((o:any)=> (<SelectItem key={o.id} value={o.id}>{o.id} · {o.total}</SelectItem>))}
+          </SelectContent>
+        </Select>
+        <Input type="number" placeholder="Amount" value={amount} onChange={e=>setAmount(e.target.value)} />
+        <Button onClick={() => { if (!orderId || !amount) return; const id = `inv-${Date.now()}`; upsertInvoice({ id, orderId, amount: Number(amount), status: 'unpaid', issuedAt: new Date().toISOString() }); toast.success('Invoice created'); setOrderId(''); setAmount('') }}>
+          <FileText className="w-4 h-4 mr-1" /> Create Invoice
+        </Button>
+      </Card>
+      <div className="space-y-2">
+        {store.invoices?.slice().reverse().map((inv:any) => (
+          <Card key={inv.id} className="p-3 flex items-center gap-2">
+            <div className="flex-1 text-sm">{inv.id} · Order {inv.orderId} · {inv.amount} · {inv.status}</div>
+            <Select value={inv.status} onValueChange={v => { upsertInvoice({ ...inv, status: v as any }); toast.success('Status updated') }}>
+              <SelectTrigger className="w-40"><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="unpaid">Unpaid</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="refunded">Refunded</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" onClick={() => { removeInvoice(inv.id); toast.success('Removed') }}>Remove</Button>
           </Card>
         ))}
       </div>
