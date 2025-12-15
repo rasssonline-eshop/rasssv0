@@ -2,11 +2,28 @@ import { NextRequest, NextResponse } from "next/server"
 import fs from "fs"
 import path from "path"
 import { put, list } from "@vercel/blob"
+import { MongoClient, Collection } from "mongodb"
 
 export const runtime = "nodejs"
 
 const dataDir = path.join(process.cwd(), ".data")
 const dataFile = path.join(dataDir, "admin-store.json")
+const mongoUri = process.env.MONGODB_URI || ""
+const mongoDb = process.env.MONGODB_DB || "rasss"
+let mongoClient: MongoClient | null = null
+type AdminStoreDoc = {
+  _id: string
+  data?: any
+  updatedAt?: Date
+}
+async function getMongoCollection(): Promise<Collection<AdminStoreDoc> | null> {
+  if (!mongoUri) return null
+  if (!mongoClient) {
+    mongoClient = new MongoClient(mongoUri)
+    await mongoClient.connect()
+  }
+  return mongoClient.db(mongoDb).collection<AdminStoreDoc>("admin_store")
+}
 const defaultStore = {
   categories: [
     { name: "Skin Care", image: "https://picsum.photos/seed/skincare/600/600", subcategories: ["Moisturizers", "Sunscreens", "Serums"] },
@@ -60,6 +77,14 @@ function ensureDir() {
 
 export async function GET() {
   try {
+    const col = await getMongoCollection()
+    if (col) {
+      const doc = await col.findOne({ _id: "store" })
+      if (doc && doc.data) return NextResponse.json(doc.data)
+      if (doc) return NextResponse.json(doc)
+    }
+  } catch {}
+  try {
     const { blobs } = await list({ prefix: "admin/store.json" })
     const b = blobs.find(x => x.pathname === "admin/store.json") || blobs[0]
     if (b) {
@@ -84,6 +109,13 @@ export async function POST(req: NextRequest) {
     const required = process.env.ADMIN_TOKEN
     if (required && token !== required) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
     const body = await req.json()
+    try {
+      const col = await getMongoCollection()
+      if (col) {
+        await col.updateOne({ _id: "store" }, { $set: { data: body, updatedAt: new Date() } }, { upsert: true })
+        return NextResponse.json({ ok: true })
+      }
+    } catch {}
     try {
       await put("admin/store.json", JSON.stringify(body), { access: "public", contentType: "application/json", addRandomSuffix: false })
       return NextResponse.json({ ok: true })

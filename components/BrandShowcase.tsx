@@ -30,7 +30,7 @@ export default function BrandShowcase() {
             {(store.brands.length ? store.brands : brands).map((brand) => (
               <Card
                 key={brand.id}
-                className="bg-white/10 aspect-square relative overflow-hidden cursor-pointer hover:shadow-md transition-transform hover:-translate-y-0.5"
+                className="bg-white/10 aspect-square relative overflow-hidden cursor-pointer transition-transform hover:-translate-y-0.5 hover:scale-105 rounded-md ring-1 ring-white/20 hover:ring-primary/30"
               >
                 <Image src={brand.logo} alt={brand.name} fill className="object-cover" sizes="100px" />
               </Card>

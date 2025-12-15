@@ -214,7 +214,7 @@ export default function ProductDetailPage() {
               <button
                 key={i}
                 onClick={() => setActive(i)}
-                className={`relative aspect-square rounded-md overflow-hidden border ${i === active ? 'border-primary ring-2 ring-primary/50' : 'border-gray-200'}`}
+                className={`relative aspect-square rounded-md overflow-hidden border transition-all ${i === active ? 'border-primary ring-2 ring-primary/50' : 'border-gray-200 hover:border-primary hover:ring-2 hover:ring-primary/30'}`}
               >
                 <Image src={src} alt={product.name} fill className="object-cover" sizes="100px" />
               </button>

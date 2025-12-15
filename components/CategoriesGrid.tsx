@@ -145,13 +145,13 @@ export default function CategoriesGrid() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {sorted.map((category) => (
             <Link key={category.name} href={`/category/${category.name}`}>
-              <Card className="bg-white rounded-xl border overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 hover:ring-2 hover:ring-primary/30 active:scale-95 active:ring-primary/40 cursor-pointer h-full">
-                <div className="relative w-full h-48">
+              <Card className="group bg-white rounded-xl border overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 hover:ring-2 hover:ring-primary/30 active:scale-95 active:ring-primary/40 cursor-pointer h-full">
+                <div className="relative aspect-[4/3] overflow-hidden">
                   <Image
                     src={store.categories.find(x => x.name === category.name)?.image || categoryImages[category.name] || categoryImages["Skin Care"]}
                     alt={category.name}
                     fill
-                    className="object-cover"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
                     sizes="(max-width:768px) 100vw, 25vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />

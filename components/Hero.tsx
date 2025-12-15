@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useI18n } from "@/components/I18nProvider"
 import { useAdmin } from "@/components/AdminProvider"
 import { useLocation } from "@/components/LocationProvider"
@@ -32,6 +32,13 @@ export default function Hero() {
   const next = () => setCurrent((current + 1) % slides.length)
   const prev = () => setCurrent((current - 1 + slides.length) % slides.length)
 
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCurrent((c) => (c + 1) % slides.length)
+    }, 5000)
+    return () => clearInterval(id)
+  }, [slides.length])
+
   return (
     <section className="bg-gray-50">
       <div className="relative w-full overflow-hidden h-[48vh] md:h-[60vh] lg:h-[70vh]">
@@ -39,10 +46,10 @@ export default function Hero() {
             src={slides[current].image}
             alt={slides[current].title}
             fill
-            className="object-cover"
+            className="object-cover transition-opacity duration-500"
             sizes="(max-width:768px) 100vw, 1200px"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/60 to-accent/60" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/50 via-primary/30 to-accent/50" />
           <div className="absolute inset-0 flex items-center justify-between px-6 md:px-8 z-10">
             <Button size="icon" variant="ghost" onClick={prev} className="bg-white/70 hover:bg-white">
               <ChevronLeft className="w-6 h-6" />
@@ -63,7 +70,7 @@ export default function Hero() {
               <button
                 key={idx}
                 onClick={() => setCurrent(idx)}
-                className={`h-2 rounded-full transition ${idx === current ? "bg-white w-8" : "bg-white/60 w-2"}`}
+                className={`h-2 rounded-full transition-all ${idx === current ? "bg-white w-8" : "bg-white/60 w-2 hover:bg-white/80"}`}
               />
             ))}
           </div>
