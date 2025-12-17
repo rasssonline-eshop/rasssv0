@@ -156,22 +156,7 @@ export default function Navigation() {
           </Link>
         </div>
 
-        {/* CATEGORY PILLS */}
-        <div className="py-1 overflow-x-auto no-scrollbar relative snap-x snap-mandatory">
-          <div className="flex items-center gap-2 sm:gap-3 flex-nowrap">
-            {categories.map((cat) => (
-              <Link
-                key={cat}
-                href={`/category/${encodeURIComponent(cat)}`}
-                className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm border snap-start ${pathname?.startsWith(`/category/${encodeURIComponent(cat)}`) ? 'bg-primary text-white border-primary hover:bg-primary/90' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
-              >
-                {labelFor(cat)}
-              </Link>
-            ))}
-          </div>
-          <div className="hidden md:block pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white to-transparent" />
-          <div className="hidden md:block pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent" />
-        </div>
+        
       </div>
     </nav>
   )
