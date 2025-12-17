@@ -10,6 +10,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'cdn.shopify.com' },
       { protocol: 'https', hostname: 'picsum.photos' },
       { protocol: 'https', hostname: 'img.freepik.com' },
+      { protocol: 'https', hostname: 'ik.imagekit.io', pathname: '/vfhlzpxfu/**' },
     ],
   },
 }

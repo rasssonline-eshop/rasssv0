@@ -7,10 +7,24 @@ import BrandShowcase from "@/components/BrandShowcase"
 import CategoriesGrid from "@/components/CategoriesGrid"
 import Footer from "@/components/Footer"
 import Image from "next/image"
+import { useState } from "react"
 import { useI18n } from "@/components/I18nProvider"
+import { buildImageKitUrl } from "@/lib/utils"
 
 export default function Home() {
   const { t } = useI18n()
+  const banner2Rel = "Home/assets/Banner/banner2.jpg"
+  const altBanner2Rel = "assets/Banner/banner2.jpg"
+  const [banner2Src, setBanner2Src] = useState(buildImageKitUrl(banner2Rel))
+  const [banner2TriedAlt, setBanner2TriedAlt] = useState(false)
+  const handleBanner2Error = () => {
+    if (!banner2TriedAlt) {
+      setBanner2Src(buildImageKitUrl(altBanner2Rel))
+      setBanner2TriedAlt(true)
+    } else {
+      setBanner2Src("https://picsum.photos/seed/fallback-banner-2/1600/900")
+    }
+  }
   return (
     <main className="bg-gray-50 min-h-screen">
       <Header />
@@ -22,11 +36,12 @@ export default function Home() {
       <section className="my-8">
         <div className="relative w-full overflow-hidden h-[40vh] md:h-[50vh] lg:h-[60vh] mx-4 md:rounded-xl md:shadow-lg">
           <Image
-            src="https://picsum.photos/seed/skincare-banner/1600/900"
+            src={banner2Src}
             alt="Skin Care Deals"
             fill
             className="object-cover"
             sizes="(max-width:768px) 100vw, 1600px"
+            onError={handleBanner2Error}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-accent/50" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6 gap-3">
@@ -47,11 +62,12 @@ export default function Home() {
       <section className="my-8">
         <div className="relative w-full overflow-hidden h-[40vh] md:h-[50vh] lg:h-[60vh] mx-4 md:rounded-xl md:shadow-lg">
           <Image
-            src="https://picsum.photos/seed/babycare-banner/1600/900"
+            src={banner2Src}
             alt="Browse Categories"
             fill
             className="object-cover"
             sizes="(max-width:768px) 100vw, 1600px"
+            onError={handleBanner2Error}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-accent/50" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6 gap-3">

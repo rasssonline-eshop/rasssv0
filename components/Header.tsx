@@ -30,7 +30,7 @@ export default function Header() {
   return (
     <header
       ref={ref}
-      className="bg-[#2c6ba4] text-white sticky top-0 z-50 shadow-sm backdrop-blur-sm"
+      className="bg-primary text-white sticky top-0 z-50 shadow-sm backdrop-blur-sm"
     >
       <div className="px-3 py-1 sm:py-2">
         <div className="flex items-center gap-2 sm:gap-4">
@@ -149,7 +149,7 @@ export default function Header() {
             {/* Cart */}
             <Button aria-label="Open cart"
               size="sm"
-              className="relative bg-white text-[#2c6ba4] font-medium hover:bg-white/90 px-3 py-1.5 rounded-xl transition-all shadow-md"
+              className="relative bg-white text-primary font-medium hover:bg-white/90 px-3 py-1.5 rounded-xl transition-all shadow-md"
               onClick={() => setOpen(true)}
             >
               <ShoppingCart className="w-4 h-4" />

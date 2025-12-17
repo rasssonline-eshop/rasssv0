@@ -7,11 +7,11 @@ import { useI18n } from "@/components/I18nProvider"
 import { useAdmin } from "@/components/AdminProvider"
 import { useLocation } from "@/components/LocationProvider"
 import Image from "next/image"
+import { buildImageKitUrl } from "@/lib/utils"
 
 const baseSlides = [
-  { id: 1, titleKey: "hero.slide1.title", subtitleKey: "hero.slide1.subtitle", image: "https://picsum.photos/seed/beauty/1200/600" },
-  { id: 2, titleKey: "hero.slide2.title", subtitleKey: "hero.slide2.subtitle", image: "https://picsum.photos/seed/skincare/1200/600" },
-  { id: 3, titleKey: "hero.slide3.title", subtitleKey: "hero.slide3.subtitle", image: "https://picsum.photos/seed/wellness/1200/600" },
+  { id: 1, titleKey: "hero.slide1.title", subtitleKey: "hero.slide1.subtitle", image: buildImageKitUrl("Home/assets/Banner/banner1.jpg") },
+  { id: 2, titleKey: "hero.slide2.title", subtitleKey: "hero.slide2.subtitle", image: buildImageKitUrl("Home/assets/Banner/banner1.jpg") },
 ]
 
 export default function Hero() {
@@ -20,7 +20,7 @@ export default function Hero() {
   const { city } = useLocation()
   const { store } = useAdmin()
   const base = store.slides.length ? store.slides.map(s => ({ id: s.id, titleKey: s.title, subtitleKey: s.subtitle, image: s.image })) : baseSlides
-  const slides = base.map((s) => ({
+  const initialSlides = base.map((s) => ({
     id: s.id,
     title: t(s.titleKey),
     subtitle: s.subtitleKey === "hero.slide3.subtitle"
@@ -28,6 +28,44 @@ export default function Hero() {
       : t(s.subtitleKey),
     image: s.image,
   }))
+  const fallbackImages = [
+    "https://picsum.photos/seed/beauty/2400/1200",
+    "https://picsum.photos/seed/wellness/3200/1800",
+  ]
+  const [slides, setSlides] = useState(initialSlides)
+  useEffect(() => {
+    let active = true
+    initialSlides.forEach((s, i) => {
+      const img = new window.Image()
+      img.src = s.image
+      img.onload = () => {}
+      img.onerror = () => {
+        if (!active) return
+        const rel = s.image.replace(/^https?:\/\/ik\.imagekit\.io\/[^/]+\//i, '')
+        const altRel = rel.startsWith('Home/') ? rel.replace(/^Home\//, '') : `Home/${rel}`
+        const altAbs = buildImageKitUrl(altRel)
+        const test = new window.Image()
+        test.src = altAbs
+        test.onload = () => {
+          if (!active) return
+          setSlides(prev => {
+            const next = [...prev]
+            next[i] = { ...prev[i], image: altAbs }
+            return next
+          })
+        }
+        test.onerror = () => {
+          if (!active) return
+          setSlides(prev => {
+            const next = [...prev]
+            next[i] = { ...prev[i], image: fallbackImages[i % fallbackImages.length] }
+            return next
+          })
+        }
+      }
+    })
+    return () => { active = false }
+  }, [initialSlides[0]?.image, initialSlides[1]?.image])
 
   const next = () => setCurrent((current + 1) % slides.length)
   const prev = () => setCurrent((current - 1 + slides.length) % slides.length)
