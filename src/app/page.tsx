@@ -34,13 +34,13 @@ export default function Home() {
       
       <BrandShowcase />
       <section className="my-8">
-        <div className="relative w-full overflow-hidden h-[40vh] md:h-[50vh] lg:h-[60vh] mx-4 md:rounded-xl md:shadow-lg">
+        <div className="relative w-full max-w-[3200px] mx-auto overflow-hidden aspect-[16/9] md:rounded-xl md:shadow-lg">
           <Image
             src={banner2Src}
             alt="Skin Care Deals"
             fill
             className="object-cover"
-            sizes="(max-width:768px) 100vw, 1600px"
+            sizes="(max-width:768px) 100vw, (max-width:1536px) 100vw, 3200px"
             onError={handleBanner2Error}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-accent/50" />
@@ -60,13 +60,13 @@ export default function Home() {
       </section>
       <CategoriesGrid />
       <section className="my-8">
-        <div className="relative w-full overflow-hidden h-[40vh] md:h-[50vh] lg:h-[60vh] mx-4 md:rounded-xl md:shadow-lg">
+        <div className="relative w-full max-w-[3200px] mx-auto overflow-hidden aspect-[16/9] md:rounded-xl md:shadow-lg">
           <Image
             src={banner2Src}
             alt="Browse Categories"
             fill
             className="object-cover"
-            sizes="(max-width:768px) 100vw, 1600px"
+            sizes="(max-width:768px) 100vw, (max-width:1536px) 100vw, 3200px"
             onError={handleBanner2Error}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-accent/50" />

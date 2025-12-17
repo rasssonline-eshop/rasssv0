@@ -79,13 +79,13 @@ export default function Hero() {
 
   return (
     <section className="bg-gray-50">
-      <div className="relative w-full overflow-hidden h-[48vh] md:h-[60vh] lg:h-[70vh]">
+      <div className="relative w-full max-w-[2400px] mx-auto overflow-hidden aspect-[2/1]">
           <Image
             src={slides[current].image}
             alt={slides[current].title}
             fill
             className="object-cover transition-opacity duration-500"
-            sizes="(max-width:768px) 100vw, 1200px"
+            sizes="(max-width:768px) 100vw, (max-width:1536px) 100vw, 2400px"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/50 via-primary/30 to-accent/50" />
           <div className="absolute inset-0 flex items-center justify-between px-6 md:px-8 z-10">
