@@ -13,12 +13,23 @@ export type AdminProduct = {
   id: string
   name: string
   slug?: string
+  sku?: string
+  description?: string
   price: number
   oldPrice?: number
+  costPrice?: number
   image?: string
+  images?: string[]
   rating?: number
   brand?: string
   category: string
+  stock?: number
+  lowStockThreshold?: number
+  status?: 'active' | 'inactive'
+  metaTitle?: string
+  metaDescription?: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 export type AdminSlide = { id: string, title: string, subtitle: string, image: string }
@@ -104,22 +115,22 @@ function load(): AdminStore {
   try {
     const raw = localStorage.getItem("adminStore")
     if (raw) return JSON.parse(raw)
-  } catch {}
+  } catch { }
   return defaultStore
 }
 
 function save(s: AdminStore) {
-  try { localStorage.setItem("adminStore", JSON.stringify(s)) } catch {}
+  try { localStorage.setItem("adminStore", JSON.stringify(s)) } catch { }
 }
 
 export default function AdminProvider({ children }: { children: React.ReactNode }) {
   const [store, setStoreState] = React.useState<AdminStore>(defaultStore)
   React.useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       try {
         const res = await fetch('/api/admin/store', { method: 'GET', headers: { accept: 'application/json' }, cache: 'no-store' })
         if (res.ok) { const json = await res.json(); setStoreState(json); save(json); return }
-      } catch {}
+      } catch { }
       setStoreState(load())
     })()
   }, [])
@@ -129,7 +140,7 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     try {
       const token = localStorage.getItem('adminPin') || ''
       fetch('/api/admin/store', { method: 'POST', headers: { 'content-type': 'application/json', 'x-admin-token': token }, body: JSON.stringify(s) })
-    } catch {}
+    } catch { }
   }, [])
 
   const addCategory = (c: AdminCategory) => {
