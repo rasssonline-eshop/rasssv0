@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronDown, Zap, Globe, Heart } from "lucide-react"
+import { ChevronDown, Zap, Globe, Heart, Store } from "lucide-react"
 import Link from "next/link"
 import {
   DropdownMenu,
@@ -39,8 +39,8 @@ export default function Navigation() {
     }
   }
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-[calc(var(--header-height)-6px)] z-40 shadow-sm">
-      <div className="px-4 overflow-x-auto no-scrollbar">
+    <nav className="bg-white border-b border-gray-200 sticky top-[calc(var(--header-height)-6px)] z-[100] shadow-sm">
+      <div className="px-4 overflow-x-auto sm:overflow-visible no-scrollbar">
         <div className="hidden sm:flex items-center gap-4 sm:gap-6 py-2 flex-nowrap">
           {/* CATEGORY DROPDOWN */}
           <DropdownMenu>
@@ -102,13 +102,19 @@ export default function Navigation() {
                 />
               </button>
             </DropdownMenuTrigger>
-
+            {/* E-SERVICES DROPDOWN CONTENT */}
             <DropdownMenuContent align="start" className="w-56">
               <DropdownMenuItem asChild>
-                <Link href="/healthcare-center">{t("nav.healthcareCenter")}</Link>
+                <Link href="/healthcare-center" className="w-full cursor-pointer">{t("nav.healthcareCenter")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/e-services/consult-a-gp">Consult a GP</Link>
+                <Link href="/e-services/consult-a-gp" className="w-full cursor-pointer">Consult a GP</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/e-services" className="flex items-center gap-2 w-full cursor-pointer">
+                  <Store className="w-4 h-4 text-purple-600" />
+                  <span>{t("nav.sellWithRass")}</span>
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -119,11 +125,11 @@ export default function Navigation() {
             <span className="transition-all duration-300 group-hover:text-blue-600 group-hover:drop-shadow-[0_0_4px_rgba(0,123,255,0.25)]">{t("nav.flashSales")}</span>
             <span
               className="
-                absolute bottom-0 right-0
-                h-[3px] w-full bg-blue-400 rounded-full
-                translate-y-3 opacity-0 transition-all duration-300 ease-out
-                group-hover:translate-y-0 group-hover:opacity-100
-              "
+                  absolute bottom-0 right-0
+                  h-[3px] w-full bg-blue-400 rounded-full
+                  translate-y-3 opacity-0 transition-all duration-300 ease-out
+                  group-hover:translate-y-0 group-hover:opacity-100
+                "
             />
           </Link>
 
@@ -156,8 +162,9 @@ export default function Navigation() {
           </Link>
         </div>
 
-        
+
       </div>
-    </nav>
+    </nav >
   )
 }
+

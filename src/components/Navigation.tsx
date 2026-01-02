@@ -1,7 +1,8 @@
-import { ChevronDown, Zap, Globe, Heart } from "lucide-react"
+import { ChevronDown, Zap, Globe, Heart, Store } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Link, useLocation } from "react-router-dom"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { useI18n } from "@/components/I18nProvider"
 
 const categories = [
@@ -16,8 +17,7 @@ const categories = [
 ]
 
 export default function Navigation() {
-  const location = useLocation()
-  const pathname = location.pathname
+  const pathname = usePathname()
   const { t } = useI18n()
   const labelFor = (cat: string) => {
     switch (cat) {
@@ -50,35 +50,52 @@ export default function Navigation() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link to="/flash-sales" className={`flex items-center gap-1 text-sm ${pathname === '/flash-sales' ? 'text-blue-600' : ''}`}>
+          <Link href="/flash-sales" className={`flex items-center gap-1 text-sm ${pathname === '/flash-sales' ? 'text-blue-600' : ''}`}>
             <Zap className="w-4 h-4 text-yellow-500" />
             <span>{t("nav.flashSales")}</span>
           </Link>
 
-          <Link to="/global" className={`flex items-center gap-1 text-sm ${pathname === '/global' ? 'text-blue-600' : ''}`}>
+          <Link href="/global" className={`flex items-center gap-1 text-sm ${pathname === '/global' ? 'text-blue-600' : ''}`}>
             <Globe className="w-4 h-4" />
             <span>{t("nav.global")}</span>
           </Link>
 
-          <Link to="/healthcare-center" className={`flex items-center gap-1 text-sm ${pathname === '/healthcare-center' ? 'text-blue-600' : ''}`}>
+          <Link href="/healthcare-center" className={`flex items-center gap-1 text-sm ${pathname === '/healthcare-center' ? 'text-blue-600' : ''}`}>
             <Heart className="w-4 h-4 text-red-500" />
             <span>{t("nav.healthcareCenter")}</span>
           </Link>
 
-          <div className="ml-auto hidden md:flex items-center gap-2 text-sm">
-            <span className="text-gray-600">{t("nav.eServices")}</span>
-            <ChevronDown className="w-4 h-4" />
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="ml-auto hidden md:flex items-center gap-2 text-sm text-gray-600 hover:text-primary hover:bg-transparent">
+                <span>SERVICES TEST</span>
+                <ChevronDown className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem asChild>
+                <Link href="/e-services" className="w-full cursor-pointer">
+                  {t("nav.eServices")}
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/e-services" className="w-full flex items-center gap-2 cursor-pointer">
+                  <Store className="w-4 h-4 text-purple-600" />
+                  <span>{t("nav.sellWithRass")}</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="container py-1 overflow-x-auto no-scrollbar snap-x snap-mandatory">
           <div className="flex items-center gap-2 sm:gap-3 flex-nowrap">
             {categories.map((cat) => {
               const href = `/category/${encodeURIComponent(cat)}`
-              const active = pathname.startsWith(href)
+              const active = pathname?.startsWith(href)
               return (
                 <Link
                   key={cat}
-                  to={href}
+                  href={href}
                   className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm border snap-start ${active ? 'bg-primary text-white border-primary hover:bg-primary/90' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
                 >
                   {labelFor(cat)}

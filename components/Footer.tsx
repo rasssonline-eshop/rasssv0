@@ -7,7 +7,7 @@ import { useI18n } from "@/components/I18nProvider"
 export default function Footer() {
   const { t } = useI18n()
   return (
-    <footer className="bg-[#2c6ba4] text-white">
+    <footer className="bg-primary text-white">
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>

@@ -21,6 +21,7 @@ const dict: Record<Lang, Record<string, string>> = {
     "nav.flashSales": "Flash Sales",
     "nav.global": "Global",
     "nav.healthcareCenter": "Healthcare Center",
+    "nav.sellWithRass": "Sell with Rass",
     "brands.shopBy": "Shop by Brands",
     "home.browseCategories": "Browse Categories",
     "home.findFast": "Find what you need, fast",
@@ -68,6 +69,32 @@ const dict: Record<Lang, Record<string, string>> = {
     "hero.slide2.subtitle": "Exclusive online deals every day",
     "hero.slide3.title": "Same-Day Delivery",
     "hero.slide3.subtitle": "Available in Lahore",
+    "auth.logout": "Logout",
+    "auth.customerLogin": "Customer Login",
+    "auth.sellerLogin": "Seller Login",
+    "auth.phoneNumber": "Phone Number",
+    "auth.enterOtp": "Enter OTP",
+    "auth.verify": "Verify",
+    "auth.sendOtp": "Send OTP",
+    "profile.myProfile": "My Profile",
+    "profile.orders": "Orders",
+    "profile.wishlist": "Wishlist",
+    "profile.addresses": "Addresses",
+    "seller.dashboard": "Seller Dashboard",
+    "seller.pending": "Pending Approval",
+    "seller.approved": "Approved",
+    "seller.rejected": "Rejected",
+    "seller.waitingApproval": "Waiting for admin approval",
+    "seller.sellOurProducts": "Sell Our Products",
+    "seller.sellYourProducts": "Sell Your Products",
+    "seller.rejectionReason": "Rejection Reason",
+    "admin.sellers": "Sellers",
+    "admin.approve": "Approve",
+    "admin.reject": "Reject",
+    "admin.allSellers": "All Sellers",
+    "admin.pendingSellers": "Pending",
+    "admin.approvedSellers": "Approved",
+    "admin.rejectedSellers": "Rejected",
   },
   ur: {
     "deliverTo": "ڈیلیور کریں",
@@ -78,6 +105,7 @@ const dict: Record<Lang, Record<string, string>> = {
     "nav.flashSales": "فلیش سیلز",
     "nav.global": "گلوبل",
     "nav.healthcareCenter": "ہیلتھ کیئر سینٹر",
+    "nav.sellWithRass": "راسس کے ساتھ بیچیں",
     "brands.shopBy": "برانڈز کے مطابق خریدیں",
     "home.browseCategories": "زمرہ جات دیکھیں",
     "home.findFast": "جو چاہیں فوراً تلاش کریں",
@@ -125,6 +153,32 @@ const dict: Record<Lang, Record<string, string>> = {
     "hero.slide2.subtitle": "خصوصی آن لائن ڈیلز روزانہ",
     "hero.slide3.title": "اسی دن ڈیلیوری",
     "hero.slide3.subtitle": "صرف لاہور میں دستیاب",
+    "auth.logout": "لاگ آؤٹ",
+    "auth.customerLogin": "کسٹمر لاگ ان",
+    "auth.sellerLogin": "سیلر لاگ ان",
+    "auth.phoneNumber": "فون نمبر",
+    "auth.enterOtp": "OTP درج کریں",
+    "auth.verify": "تصدیق کریں",
+    "auth.sendOtp": "OTP بھیجیں",
+    "profile.myProfile": "میری پروفائل",
+    "profile.orders": "آرڈرز",
+    "profile.wishlist": "خواہش کی فہرست",
+    "profile.addresses": "پتے",
+    "seller.dashboard": "سیلر ڈیش بورڈ",
+    "seller.pending": "منظوری زیر التواء",
+    "seller.approved": "منظور شدہ",
+    "seller.rejected": "مسترد",
+    "seller.waitingApproval": "ایڈمن کی منظوری کا انتظار",
+    "seller.sellOurProducts": "ہماری مصنوعات بیچیں",
+    "seller.sellYourProducts": "اپنی مصنوعات بیچیں",
+    "seller.rejectionReason": "مسترد کرنے کی وجہ",
+    "admin.sellers": "سیلرز",
+    "admin.approve": "منظور کریں",
+    "admin.reject": "مسترد کریں",
+    "admin.allSellers": "تمام سیلرز",
+    "admin.pendingSellers": "زیر التواء",
+    "admin.approvedSellers": "منظور شدہ",
+    "admin.rejectedSellers": "مسترد شدہ",
   },
 }
 
@@ -143,11 +197,11 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     try {
       const saved = localStorage.getItem("lang") as Lang | null
       if (saved === "en" || saved === "ur") setLang(saved)
-    } catch {}
+    } catch { }
   }, [])
 
   React.useEffect(() => {
-    try { localStorage.setItem("lang", lang) } catch {}
+    try { localStorage.setItem("lang", lang) } catch { }
     if (typeof document !== "undefined") {
       document.documentElement.setAttribute("lang", lang === "ur" ? "ur" : "en")
       document.documentElement.setAttribute("dir", lang === "ur" ? "rtl" : "ltr")

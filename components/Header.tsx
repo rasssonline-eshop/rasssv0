@@ -9,6 +9,9 @@ import { useCart } from "@/components/CartProvider"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { useLocation, cities } from "@/components/LocationProvider"
 import { useI18n } from "@/components/I18nProvider"
+import { useAuth } from "@/components/AuthProvider"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
+import Link from "next/link"
 
 export default function Header() {
   const ref = useRef<HTMLElement | null>(null)
@@ -16,6 +19,7 @@ export default function Header() {
   const { city, setCity } = useLocation()
   const [query, setQuery] = useState("")
   const { lang, setLang, t } = useI18n()
+  const { user, isAuthenticated, logout } = useAuth()
 
   useEffect(() => {
     const update = () => {
@@ -119,23 +123,101 @@ export default function Header() {
             </Button>
 
             {/* User (Mobile) */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white/90 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 sm:hidden rounded-xl transition-all"
-            >
-              <User className="w-4 h-4" />
-            </Button>
+            {!isAuthenticated ? (
+              <Link href="/login">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white/90 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 sm:hidden rounded-xl transition-all"
+                >
+                  <User className="w-4 h-4" />
+                </Button>
+              </Link>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white/90 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 sm:hidden rounded-xl transition-all"
+                  >
+                    <User className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {user?.role === "customer" && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile/customer" className="cursor-pointer">{t("profile.myProfile")}</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile/customer" className="cursor-pointer">{t("profile.orders")}</Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  {user?.role === "seller" && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile/seller" className="cursor-pointer">{t("seller.dashboard")}</Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive">
+                    {t("auth.logout")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             {/* User (Desktop) */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden sm:flex gap-2 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm px-3 py-1.5 border border-white/20 rounded-xl transition-all"
-            >
-              <User className="w-4 h-4" />
-              {t("login")}
-            </Button>
+            {!isAuthenticated ? (
+              <Link href="/login">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden sm:flex gap-2 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm px-3 py-1.5 border border-white/20 rounded-xl transition-all"
+                >
+                  <User className="w-4 h-4" />
+                  {t("login")}
+                </Button>
+              </Link>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="hidden sm:flex gap-2 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm px-3 py-1.5 border border-white/20 rounded-xl transition-all"
+                  >
+                    <User className="w-4 h-4" />
+                    {user?.name || "User"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {user?.role === "customer" && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile/customer" className="cursor-pointer">{t("profile.myProfile")}</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile/customer" className="cursor-pointer">{t("profile.orders")}</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile/customer" className="cursor-pointer">{t("profile.wishlist")}</Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  {user?.role === "seller" && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile/seller" className="cursor-pointer">{t("seller.dashboard")}</Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive">
+                    {t("auth.logout")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             {/* Wishlist */}
             <Button aria-label="Wishlist"

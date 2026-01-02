@@ -6,6 +6,7 @@ import BrandShowcase from "./components/BrandShowcase"
 import CategoriesGrid from "./components/CategoriesGrid"
 import Footer from "./components/Footer"
 import CategoryPage from "./pages/CategoryPage"
+import EServices from "./pages/EServices"
 import { I18nProvider } from "@/components/I18nProvider"
 import AdminProvider from "@/components/AdminProvider"
 
@@ -18,6 +19,7 @@ export default function App() {
             <Header />
             <Navigation />
             <Routes>
+              <Route path="/e-services" element={<EServices />} />
               <Route
                 path="/"
                 element={
