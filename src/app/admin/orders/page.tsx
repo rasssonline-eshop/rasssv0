@@ -15,6 +15,7 @@ export default function OrdersPage() {
     const [statusFilter, setStatusFilter] = useState<string>("all")
 
     const filteredOrders = useMemo(() => {
+        if (!store || !store.orders) return []
         return store.orders.filter(order => {
             const matchesSearch =
                 order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||

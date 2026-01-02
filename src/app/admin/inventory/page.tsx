@@ -21,6 +21,7 @@ export default function InventoryPage() {
     })
 
     const allProducts = useMemo(() => {
+        if (!store || !store.productsByCategory) return []
         return Object.entries(store.productsByCategory).flatMap(([category, products]) =>
             products.map(p => ({ ...p, category }))
         )
@@ -52,6 +53,7 @@ export default function InventoryPage() {
     }
 
     const recentMovements = useMemo(() => {
+        if (!store || !store.inventory) return []
         return [...store.inventory]
             .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
             .slice(0, 10)

@@ -17,6 +17,7 @@ export default function ProductsPage() {
 
     // Get all products
     const allProducts = useMemo(() => {
+        if (!store || !store.productsByCategory) return []
         return Object.entries(store.productsByCategory).flatMap(([category, products]) =>
             products.map(p => ({ ...p, category }))
         )
@@ -72,7 +73,7 @@ export default function ProductsPage() {
                             className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                         >
                             <option value="all">All Categories</option>
-                            {store.categories.map((cat) => (
+                            {(store?.categories || []).map((cat) => (
                                 <option key={cat.name} value={cat.name}>
                                     {cat.name}
                                 </option>

@@ -9,6 +9,17 @@ export default function AnalyticsPage() {
     const { store } = useAdmin()
 
     const analytics = useMemo(() => {
+        if (!store || !store.productsByCategory || !store.orders) {
+            return {
+                totalRevenue: 0,
+                totalOrders: 0,
+                totalProducts: 0,
+                avgOrderValue: 0,
+                bestSellers: [],
+                topCategories: [],
+            }
+        }
+
         const allProducts = Object.values(store.productsByCategory).flat()
 
         // Calculate total revenue

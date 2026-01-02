@@ -10,6 +10,15 @@ export default function AdminDashboard() {
 
   // Calculate metrics
   const metrics = useMemo(() => {
+    if (!store || !store.productsByCategory || !store.orders) {
+      return {
+        totalRevenue: 0,
+        totalOrders: 0,
+        totalProducts: 0,
+        lowStockProducts: 0
+      }
+    }
+
     const allProducts = Object.values(store.productsByCategory).flat()
     const totalProducts = allProducts.length
     const totalOrders = store.orders.length
@@ -27,6 +36,7 @@ export default function AdminDashboard() {
   }, [store])
 
   const recentOrders = useMemo(() => {
+    if (!store || !store.orders) return []
     return [...store.orders]
       .sort((a, b) => new Date(b.placedAt).getTime() - new Date(a.placedAt).getTime())
       .slice(0, 5)
