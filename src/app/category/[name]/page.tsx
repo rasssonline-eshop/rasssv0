@@ -79,18 +79,32 @@ export default function CategoryPage() {
 
   const brands = ["Uriage", "Vichy", "Avene", "Bioderma", "Cerave"]
   const rngBase = seededRng(strHash(name))
-  const adminProds = store.productsByCategory[name]
-  const products = (adminProds && adminProds.length ? adminProds.map((p, i) => ({ id: p.id || String(i), name: p.name, slug: p.slug || `${name.toLowerCase().replace(/\s+/g, '-')}-product-${i + 1}`, price: p.price, rating: String(p.rating ?? 4.2), brand: p.brand || 'Rasss', oldPrice: p.oldPrice })) : Array(12))
-    .fill(null)
-    .map((_, i) => ({
-      id: i,
-      name: `${name} Product ${i + 1}`,
-      slug: `${name.toLowerCase().replace(/\s+/g, '-')}-product-${i + 1}`,
-      price: Math.floor((rngBase() + i * 0.01) * 180) + 20,
-      rating: (3 + ((rngBase() + i * 0.03) % 1) * 2).toFixed(1),
-      brand: brands[i % brands.length],
-      oldPrice: Math.floor((rngBase() + i * 0.02) * 200) + 70,
+  const adminProds = store.productsByCategory[name] || []
+
+  // Use admin products if they exist, otherwise generate fake products for demo
+  const products = adminProds.length > 0
+    ? adminProds.map((p, i) => ({
+      id: p.id || String(i),
+      name: p.name,
+      slug: p.slug || `${name.toLowerCase().replace(/\s+/g, '-')}-product-${i + 1}`,
+      price: p.price,
+      rating: String(p.rating ?? 4.2),
+      brand: p.brand || 'Rasss',
+      oldPrice: p.oldPrice || p.price * 1.3,
+      image: p.image,
     }))
+    : Array(12)
+      .fill(null)
+      .map((_, i) => ({
+        id: i,
+        name: `${name} Product ${i + 1}`,
+        slug: `${name.toLowerCase().replace(/\s+/g, '-')}-product-${i + 1}`,
+        price: Math.floor((rngBase() + i * 0.01) * 180) + 20,
+        rating: (3 + ((rngBase() + i * 0.03) % 1) * 2).toFixed(1),
+        brand: brands[i % brands.length],
+        oldPrice: Math.floor((rngBase() + i * 0.02) * 200) + 70,
+        image: undefined as string | undefined,
+      }))
 
   const [sort, setSort] = React.useState<'relevance' | 'priceAsc' | 'priceDesc' | 'ratingDesc'>('relevance')
   const [minPrice, setMinPrice] = React.useState(0)
@@ -109,7 +123,7 @@ export default function CategoryPage() {
       case 'ratingDesc':
         return parseFloat(b.rating) - parseFloat(a.rating)
       default:
-        return a.id - b.id
+        return (typeof a.id === 'number' ? a.id : 0) - (typeof b.id === 'number' ? b.id : 0)
     }
   })
 
@@ -145,7 +159,7 @@ export default function CategoryPage() {
               <Card className="bg-white rounded-xl border overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 hover:ring-2 hover:ring-primary/30 active:scale-95 active:ring-primary/40">
                 <div className="relative aspect-square overflow-hidden">
                   <Image
-                    src={(adminProds && adminProds.length ? (adminProds.find(x => (x.slug || x.name.toLowerCase().replace(/\s+/g, '-')) === product.slug)?.image || '') : '') || categoryImages[name] || categoryImages["Skin Care"]}
+                    src={product.image || categoryImages[name] || categoryImages["Skin Care"]}
                     alt={product.name}
                     fill
                     className="object-cover"
@@ -183,7 +197,7 @@ export default function CategoryPage() {
                           slug: product.slug,
                           name: product.name,
                           price: product.price,
-                          image: categoryImages[name] || categoryImages["Skin Care"],
+                          image: product.image || categoryImages[name] || categoryImages["Skin Care"],
                         }, 1)
                       }}
                     >
