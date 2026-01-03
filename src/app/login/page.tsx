@@ -2,142 +2,201 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useAuth } from "@/components/AuthProvider"
 import { useI18n } from "@/components/I18nProvider"
+import { toast } from "sonner"
 
 export default function LoginPage() {
     const router = useRouter()
-    const { login } = useAuth()
     const { t } = useI18n()
-    const [phone, setPhone] = useState("")
-    const [otp, setOtp] = useState("")
-    const [otpSent, setOtpSent] = useState(false)
-    const [activeTab, setActiveTab] = useState<"customer" | "seller">("customer")
+    const [activeTab, setActiveTab] = useState<"login" | "register">("login")
+    const [loading, setLoading] = useState(false)
 
-    const handleSendOtp = () => {
-        // Mock OTP send
-        if (phone.length >= 10) {
-            setOtpSent(true)
+    // Login state
+    const [loginEmail, setLoginEmail] = useState("")
+    const [loginPassword, setLoginPassword] = useState("")
+
+    // Register state
+    const [registerName, setRegisterName] = useState("")
+    const [registerEmail, setRegisterEmail] = useState("")
+    const [registerPassword, setRegisterPassword] = useState("")
+    const [registerRole, setRegisterRole] = useState<"customer" | "seller">("customer")
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setLoading(true)
+
+        try {
+            const result = await signIn("credentials", {
+                email: loginEmail,
+                password: loginPassword,
+                redirect: false,
+            })
+
+            if (result?.error) {
+                toast.error("Invalid email or password")
+            } else {
+                toast.success("Login successful!")
+                router.push("/")
+                router.refresh()
+            }
+        } catch (error) {
+            toast.error("Login failed")
+        } finally {
+            setLoading(false)
         }
     }
 
-    const handleVerify = () => {
-        // Mock OTP verification
-        if (otp === "1234") {
-            const userData = {
-                id: Math.random().toString(36).substr(2, 9),
-                phone,
-                role: activeTab,
-                name: activeTab === "customer" ? "Customer User" : "Seller User",
-                email: `${activeTab}@example.com`,
-                ...(activeTab === "seller" && { sellerStatus: "pending" as const }),
+    const handleRegister = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setLoading(true)
+
+        try {
+            const response = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: registerName,
+                    email: registerEmail,
+                    password: registerPassword,
+                    role: registerRole,
+                }),
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                toast.error(data.error || "Registration failed")
+                return
             }
 
-            login(userData)
-
-            if (activeTab === "customer") {
-                router.push("/profile/customer")
-            } else {
-                router.push("/profile/seller")
-            }
+            toast.success("Registration successful! Please login.")
+            setActiveTab("login")
+            setLoginEmail(registerEmail)
+        } catch (error) {
+            toast.error("Registration failed")
+        } finally {
+            setLoading(false)
         }
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
             <Card className="w-full max-w-md">
                 <CardHeader>
                     <CardTitle className="text-2xl text-center">Welcome to Rasss</CardTitle>
-                    <CardDescription className="text-center">Login to continue</CardDescription>
+                    <CardDescription className="text-center">
+                        Login or create an account to continue
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "customer" | "seller")}>
-                        <TabsList className="grid w-full grid-cols-2 mb-6">
-                            <TabsTrigger value="customer">{t("auth.customerLogin")}</TabsTrigger>
-                            <TabsTrigger value="seller">{t("auth.sellerLogin")}</TabsTrigger>
+                    <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="login">Login</TabsTrigger>
+                            <TabsTrigger value="register">Register</TabsTrigger>
                         </TabsList>
 
-                        <TabsContent value="customer" className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="customer-phone">{t("auth.phoneNumber")}</Label>
-                                <Input
-                                    id="customer-phone"
-                                    type="tel"
-                                    placeholder="+92 300 1234567"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                    disabled={otpSent}
-                                />
-                            </div>
-
-                            {otpSent && (
+                        <TabsContent value="login">
+                            <form onSubmit={handleLogin} className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="customer-otp">{t("auth.enterOtp")}</Label>
+                                    <Label htmlFor="login-email">Email</Label>
                                     <Input
-                                        id="customer-otp"
-                                        type="text"
-                                        placeholder="1234"
-                                        value={otp}
-                                        onChange={(e) => setOtp(e.target.value)}
-                                        maxLength={4}
+                                        id="login-email"
+                                        type="email"
+                                        placeholder="your@email.com"
+                                        value={loginEmail}
+                                        onChange={(e) => setLoginEmail(e.target.value)}
+                                        required
                                     />
-                                    <p className="text-xs text-muted-foreground">Demo OTP: 1234</p>
                                 </div>
-                            )}
-
-                            {!otpSent ? (
-                                <Button onClick={handleSendOtp} className="w-full" disabled={phone.length < 10}>
-                                    {t("auth.sendOtp")}
+                                <div className="space-y-2">
+                                    <Label htmlFor="login-password">Password</Label>
+                                    <Input
+                                        id="login-password"
+                                        type="password"
+                                        placeholder="••••••••"
+                                        value={loginPassword}
+                                        onChange={(e) => setLoginPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <Button type="submit" className="w-full" disabled={loading}>
+                                    {loading ? "Logging in..." : "Login"}
                                 </Button>
-                            ) : (
-                                <Button onClick={handleVerify} className="w-full" disabled={otp.length !== 4}>
-                                    {t("auth.verify")}
-                                </Button>
-                            )}
+                                <p className="text-sm text-gray-500 text-center">
+                                    Test: admin@rasss.com / admin123
+                                </p>
+                            </form>
                         </TabsContent>
 
-                        <TabsContent value="seller" className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="seller-phone">{t("auth.phoneNumber")}</Label>
-                                <Input
-                                    id="seller-phone"
-                                    type="tel"
-                                    placeholder="+92 300 1234567"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                    disabled={otpSent}
-                                />
-                            </div>
-
-                            {otpSent && (
+                        <TabsContent value="register">
+                            <form onSubmit={handleRegister} className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="seller-otp">{t("auth.enterOtp")}</Label>
+                                    <Label htmlFor="register-name">Full Name</Label>
                                     <Input
-                                        id="seller-otp"
+                                        id="register-name"
                                         type="text"
-                                        placeholder="1234"
-                                        value={otp}
-                                        onChange={(e) => setOtp(e.target.value)}
-                                        maxLength={4}
+                                        placeholder="John Doe"
+                                        value={registerName}
+                                        onChange={(e) => setRegisterName(e.target.value)}
+                                        required
                                     />
-                                    <p className="text-xs text-muted-foreground">Demo OTP: 1234</p>
                                 </div>
-                            )}
-
-                            {!otpSent ? (
-                                <Button onClick={handleSendOtp} className="w-full" disabled={phone.length < 10}>
-                                    {t("auth.sendOtp")}
+                                <div className="space-y-2">
+                                    <Label htmlFor="register-email">Email</Label>
+                                    <Input
+                                        id="register-email"
+                                        type="email"
+                                        placeholder="your@email.com"
+                                        value={registerEmail}
+                                        onChange={(e) => setRegisterEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="register-password">Password</Label>
+                                    <Input
+                                        id="register-password"
+                                        type="password"
+                                        placeholder="••••••••"
+                                        value={registerPassword}
+                                        onChange={(e) => setRegisterPassword(e.target.value)}
+                                        required
+                                        minLength={6}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Account Type</Label>
+                                    <div className="flex gap-4">
+                                        <label className="flex items-center gap-2">
+                                            <input
+                                                type="radio"
+                                                value="customer"
+                                                checked={registerRole === "customer"}
+                                                onChange={(e) => setRegisterRole(e.target.value as any)}
+                                            />
+                                            <span>Customer</span>
+                                        </label>
+                                        <label className="flex items-center gap-2">
+                                            <input
+                                                type="radio"
+                                                value="seller"
+                                                checked={registerRole === "seller"}
+                                                onChange={(e) => setRegisterRole(e.target.value as any)}
+                                            />
+                                            <span>Seller</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <Button type="submit" className="w-full" disabled={loading}>
+                                    {loading ? "Creating account..." : "Create Account"}
                                 </Button>
-                            ) : (
-                                <Button onClick={handleVerify} className="w-full" disabled={otp.length !== 4}>
-                                    {t("auth.verify")}
-                                </Button>
-                            )}
+                            </form>
                         </TabsContent>
                     </Tabs>
                 </CardContent>

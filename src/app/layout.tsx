@@ -9,6 +9,7 @@ import LocationProvider from '@/components/LocationProvider'
 import { I18nProvider } from '@/components/I18nProvider'
 import AdminProvider from '@/components/AdminProvider'
 import AuthProvider from '@/components/AuthProvider'
+import AuthSessionProvider from '@/components/AuthSessionProvider'
 import { Toaster } from '@/components/ui/sonner'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -55,17 +56,19 @@ export default function RootLayout({
           }}
         />
         <I18nProvider>
-          <AuthProvider>
-            <AdminProvider>
-              <LocationProvider>
-                <CartProvider>
-                  {children}
-                  <CartDrawer />
-                  <MobileNav />
-                </CartProvider>
-              </LocationProvider>
-            </AdminProvider>
-          </AuthProvider>
+          <AuthSessionProvider>
+            <AuthProvider>
+              <AdminProvider>
+                <LocationProvider>
+                  <CartProvider>
+                    {children}
+                    <CartDrawer />
+                    <MobileNav />
+                  </CartProvider>
+                </LocationProvider>
+              </AdminProvider>
+            </AuthProvider>
+          </AuthSessionProvider>
         </I18nProvider>
         <Toaster position="bottom-right" richColors />
         <Analytics />

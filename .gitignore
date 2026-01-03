@@ -13,3 +13,5 @@ yarn-debug.log*
 .env
 .env.*
 !.env.example
+
+/src/generated/prisma
