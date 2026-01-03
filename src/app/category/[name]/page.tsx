@@ -81,30 +81,17 @@ export default function CategoryPage() {
   const rngBase = seededRng(strHash(name))
   const adminProds = store.productsByCategory[name] || []
 
-  // Use admin products if they exist, otherwise generate fake products for demo
-  const products = adminProds.length > 0
-    ? adminProds.map((p, i) => ({
-      id: p.id || String(i),
-      name: p.name,
-      slug: p.slug || `${name.toLowerCase().replace(/\s+/g, '-')}-product-${i + 1}`,
-      price: p.price,
-      rating: String(p.rating ?? 4.2),
-      brand: p.brand || 'Rasss',
-      oldPrice: p.oldPrice || p.price * 1.3,
-      image: p.image,
-    }))
-    : Array(12)
-      .fill(null)
-      .map((_, i) => ({
-        id: i,
-        name: `${name} Product ${i + 1}`,
-        slug: `${name.toLowerCase().replace(/\s+/g, '-')}-product-${i + 1}`,
-        price: Math.floor((rngBase() + i * 0.01) * 180) + 20,
-        rating: (3 + ((rngBase() + i * 0.03) % 1) * 2).toFixed(1),
-        brand: brands[i % brands.length],
-        oldPrice: Math.floor((rngBase() + i * 0.02) * 200) + 70,
-        image: undefined as string | undefined,
-      }))
+  // Only show real admin products - no fake/dummy products
+  const products = adminProds.map((p, i) => ({
+    id: p.id || String(i),
+    name: p.name,
+    slug: p.slug || `${name.toLowerCase().replace(/\s+/g, '-')}-product-${i + 1}`,
+    price: p.price,
+    rating: String(p.rating ?? 4.2),
+    brand: p.brand || 'Rasss',
+    oldPrice: p.oldPrice || p.price * 1.3,
+    image: p.image,
+  }))
 
   const [sort, setSort] = React.useState<'relevance' | 'priceAsc' | 'priceDesc' | 'ratingDesc'>('relevance')
   const [minPrice, setMinPrice] = React.useState(0)

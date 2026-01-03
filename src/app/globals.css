@@ -131,3 +131,7 @@
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
+
+/* Hide fake related products and extra thumbnails */
+.container > .mt-10:last-child { display: none !important; }
+.grid.grid-cols-5.gap-2 > button:nth-child(n+2) { display: none !important; }
