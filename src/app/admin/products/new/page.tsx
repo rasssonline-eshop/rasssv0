@@ -55,25 +55,27 @@ export default function NewProductPage() {
 
         for (const file of Array.from(files)) {
             try {
-                const formData = new FormData()
-                formData.append('file', file)
-
-                const response = await fetch('/api/admin/upload', {
-                    method: 'POST',
-                    body: formData,
+                // Convert image to base64 for immediate display and storage
+                const reader = new FileReader()
+                const base64Promise = new Promise<string>((resolve, reject) => {
+                    reader.onload = () => resolve(reader.result as string)
+                    reader.onerror = reject
+                    reader.readAsDataURL(file)
                 })
 
-                if (response.ok) {
-                    const data = await response.json()
-                    newImages.push(data.url)
-                }
+                const base64 = await base64Promise
+                newImages.push(base64)
             } catch (error) {
                 console.error('Upload failed:', error)
+                alert(`Failed to upload ${file.name}`)
             }
         }
 
         setImages(prev => [...prev, ...newImages])
         setUploading(false)
+
+        // Reset the input so the same file can be selected again if needed
+        e.target.value = ''
     }
 
     const removeImage = (index: number) => {
