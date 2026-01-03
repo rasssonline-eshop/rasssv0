@@ -57,6 +57,7 @@ type AdminStore = {
   suppliers: Supplier[]
   purchaseOrders: PurchaseOrder[]
   invoices: Invoice[]
+  whatsappNumber?: string
 }
 
 type AdminContextValue = {
@@ -87,6 +88,7 @@ type AdminContextValue = {
   removePurchaseOrder: (id: string) => void
   upsertInvoice: (inv: Invoice) => void
   removeInvoice: (id: string) => void
+  setWhatsappNumber: (number: string) => void
 }
 
 const defaultStore: AdminStore = {
@@ -247,6 +249,10 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     const s = { ...store, invoices: store.invoices.filter(x => x.id !== id) }
     setStore(s)
   }
+  const setWhatsappNumber = (number: string) => {
+    const s = { ...store, whatsappNumber: number }
+    setStore(s)
+  }
 
   const importJson = (json: AdminStore) => setStore(json)
   const exportJson = () => JSON.stringify(store, null, 2)
@@ -279,6 +285,7 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     removePurchaseOrder,
     upsertInvoice,
     removeInvoice,
+    setWhatsappNumber,
   }
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>
 }

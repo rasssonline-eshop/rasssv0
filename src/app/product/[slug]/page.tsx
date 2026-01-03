@@ -72,7 +72,7 @@ function getProduct(slug: string): Product {
         }
       }
     }
-  } catch {}
+  } catch { }
   if (sampleCatalog[slug]) return sampleCatalog[slug]
   const rng = seededRng(strHash(slug))
   const price = Math.floor(rng() * 180) + 20
@@ -256,7 +256,7 @@ export default function ProductDetailPage() {
             <div className="rounded-lg border bg-white p-3 flex items-center gap-2 transition-transform hover:-translate-y-0.5 hover:shadow-sm">
               <CreditCard className="w-4 h-4 text-primary" /> {t("product.cashOnDelivery")}
             </div>
-          <div className="rounded-lg border bg-white p-3 flex items-center gap-2 transition-transform hover:-translate-y-0.5 hover:shadow-sm">
+            <div className="rounded-lg border bg-white p-3 flex items-center gap-2 transition-transform hover:-translate-y-0.5 hover:shadow-sm">
               <CheckCircle className="w-4 h-4 text-primary" /> {t("product.inStock")}
             </div>
           </div>
@@ -287,8 +287,24 @@ export default function ProductDetailPage() {
           >
             Add To Cart
           </Button>
-          <Button variant="outline" className="w-full h-12 flex gap-2">
-            <Phone className="w-4 h-4" /> Call our Pharmacist
+          <Button
+            variant="outline"
+            className="w-full h-12 flex gap-2"
+            onClick={() => {
+              const whatsappNumber = (() => {
+                try {
+                  const raw = localStorage.getItem('adminStore')
+                  if (raw) {
+                    const store = JSON.parse(raw)
+                    return store.whatsappNumber || '923001234567'
+                  }
+                } catch { }
+                return '923001234567'
+              })()
+              window.open(`https://wa.me/${whatsappNumber}?text=Hi, I need help with ${encodeURIComponent(product.name)}`, '_blank')
+            }}
+          >
+            <Phone className="w-4 h-4" /> Chat with Pharmacist
           </Button>
           <div className="grid gap-3">
             <div className="rounded-lg border bg-white p-3 flex items-center gap-2">
@@ -310,7 +326,7 @@ export default function ProductDetailPage() {
       <div className="mt-10">
         <h2 className="text-xl font-bold mb-4">Related Products</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1,2,3,4].map((i) => (
+          {[1, 2, 3, 4].map((i) => (
             <Link key={i} href={`/product/sample-related-${i}`} className="block">
               <div className="rounded-lg border bg-white overflow-hidden hover:shadow-md transition-transform hover:-translate-y-0.5">
                 <div className="relative w-full aspect-square">
@@ -322,6 +338,6 @@ export default function ProductDetailPage() {
           ))}
         </div>
       </div>
-    </div>
+    </div >
   )
 }
