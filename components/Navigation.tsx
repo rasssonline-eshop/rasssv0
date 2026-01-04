@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { usePathname } from "next/navigation"
 import { useI18n } from "@/components/I18nProvider"
-import { useAdmin } from "@/components/AdminProvider"
+import { useEffect, useState } from "react"
 
 const defaultCategories = [
   "Fragrances",
@@ -26,12 +26,24 @@ const defaultCategories = [
 export default function Navigation() {
   const pathname = usePathname()
   const { t } = useI18n()
-  const { store } = useAdmin()
+  const [categoryNames, setCategoryNames] = useState<string[]>(defaultCategories)
 
-  // Use store categories if available, otherwise fallback to defaults (only names)
-  const categoryNames = store.categories.length > 0
-    ? store.categories.map(c => c.name)
-    : defaultCategories
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch("/api/categories")
+        if (res.ok) {
+          const data = await res.json()
+          if (Array.isArray(data) && data.length > 0) {
+            setCategoryNames(data.map((c: any) => c.name))
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories", error)
+      }
+    }
+    fetchCategories()
+  }, [])
 
   const labelFor = (cat: string) => {
     switch (cat) {
@@ -179,4 +191,3 @@ export default function Navigation() {
     </nav >
   )
 }
-

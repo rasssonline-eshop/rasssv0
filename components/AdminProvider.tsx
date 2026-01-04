@@ -150,6 +150,13 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
   const addCategory = (c: AdminCategory) => {
     const s = { ...store, categories: [...store.categories.filter(x => x.name !== c.name), c] }
     setStore(s)
+
+    // Sync to Prisma for Navigation
+    fetch("/api/admin/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(c)
+    }).catch(e => console.error("Category sync failed", e))
   }
   const updateCategory = (name: string, patch: Partial<AdminCategory>) => {
     const s = { ...store, categories: store.categories.map(c => c.name === name ? { ...c, ...patch } : c) }

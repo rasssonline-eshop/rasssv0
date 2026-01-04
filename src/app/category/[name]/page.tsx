@@ -12,7 +12,6 @@ import * as React from "react"
 import { useCart } from "@/components/CartProvider"
 import { Badge } from "@/components/ui/badge"
 import { useI18n } from "@/components/I18nProvider"
-import { useAdmin } from "@/components/AdminProvider"
 
 const categoryImages: Record<string, string> = {
   Fragrances: "https://picsum.photos/seed/fragrances/600/600",
@@ -75,14 +74,33 @@ export default function CategoryPage() {
   })()
   const { addItem } = useCart()
   const { t, lang } = useI18n()
-  const { store } = useAdmin()
+
+  const [apiProducts, setApiProducts] = React.useState<any[]>([])
+  const [loading, setLoading] = React.useState(true)
 
   const brands = ["Uriage", "Vichy", "Avene", "Bioderma", "Cerave"]
   const rngBase = seededRng(strHash(name))
-  const adminProds = store.productsByCategory[name] || []
 
-  // Only show real admin products - no fake/dummy products
-  const products = adminProds.map((p, i) => ({
+  React.useEffect(() => {
+    async function fetchProducts() {
+      setLoading(true)
+      try {
+        const res = await fetch(`/api/products?category=${encodeURIComponent(name)}&limit=100`)
+        if (res.ok) {
+          const data = await res.json()
+          setApiProducts(data)
+        }
+      } catch (e) {
+        console.error("Failed to fetch products", e)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProducts()
+  }, [name])
+
+  // Map API products to view model
+  const products = apiProducts.map((p, i) => ({
     id: p.id || String(i),
     name: p.name,
     slug: p.slug || `${name.toLowerCase().replace(/\s+/g, '-')}-product-${i + 1}`,
