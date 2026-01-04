@@ -22,9 +22,17 @@ export async function middleware(request: NextRequest) {
         }
 
         // For all other admin routes, check if user is admin
-        if (!token || token.role !== 'admin') {
+        if (!token) {
+            console.log('[Middleware] No token found, redirecting to login')
             return NextResponse.redirect(new URL('/admin/auth-secure-2024', request.url))
         }
+
+        if (token.role !== 'admin') {
+            console.log('[Middleware] User role is not admin:', token.role)
+            return NextResponse.redirect(new URL('/admin/auth-secure-2024', request.url))
+        }
+
+        console.log('[Middleware] Admin access granted')
     }
 
     // Protect customer/seller profile routes
