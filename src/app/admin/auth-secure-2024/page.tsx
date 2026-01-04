@@ -59,7 +59,8 @@ export default function AdminLoginPage() {
             } else {
                 toast.success("Login successful!")
                 // Redirect to admin - middleware will verify role
-                window.location.href = "/admin"
+                router.push("/admin")
+                router.refresh()
             }
         } catch (error) {
             toast.error("Login failed")
