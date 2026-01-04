@@ -16,9 +16,11 @@ export default function AdminLoginPage() {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
+        console.log('[Admin Login] Form submitted')
         setLoading(true)
 
         try {
+            console.log('[Admin Login] Calling signIn with:', { email, callbackUrl: '/admin' })
             const result = await signIn("credentials", {
                 email,
                 password,
@@ -26,11 +28,12 @@ export default function AdminLoginPage() {
                 redirect: true, // Let NextAuth handle the redirect
             })
 
+            console.log('[Admin Login] signIn result:', result)
             // If redirect is true, this code won't execute
             // NextAuth will automatically redirect on success
         } catch (error: any) {
+            console.error('[Admin Login] Error:', error)
             toast.error("Login failed")
-            console.error('Login error:', error)
             setLoading(false)
         }
     }
