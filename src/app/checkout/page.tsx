@@ -11,6 +11,7 @@ import Link from "next/link"
 export default function CheckoutPage() {
   const { items, subtotal, clear } = useCart()
   const [name, setName] = React.useState("")
+  const [email, setEmail] = React.useState("")
   const [phone, setPhone] = React.useState("")
   const [address1, setAddress1] = React.useState("")
   const [address2, setAddress2] = React.useState("")
@@ -20,8 +21,52 @@ export default function CheckoutPage() {
   const [instructions, setInstructions] = React.useState("")
   const [payment, setPayment] = React.useState<"COD" | "Card">("COD")
   const [placed, setPlaced] = React.useState(false)
+  const [loading, setLoading] = React.useState(false)
 
-  const canPlace = name && phone && address1 && city && items.length > 0
+  const canPlace = name && email && phone && address1 && city && items.length > 0 && !loading
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!canPlace) return
+
+    setLoading(true)
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          address: {
+            line1: address1,
+            line2: address2,
+            city,
+            area,
+            postal
+          },
+          items,
+          total: subtotal,
+          instructions,
+          paymentMethod: payment
+        })
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        setPlaced(true)
+        clear()
+      } else {
+        console.error("Checkout failed")
+        alert("Order failed. Please try again.")
+      }
+    } catch (err) {
+      console.error("Checkout error", err)
+      alert("Something went wrong.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="container py-8">
@@ -33,29 +78,28 @@ export default function CheckoutPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <form
           className="space-y-4 lg:col-span-2 bg-white rounded-md border p-4"
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (!canPlace) return
-            setPlaced(true)
-            clear()
-          }}
+          onSubmit={handleSubmit}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="text-sm text-gray-600">Full Name</label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} className="bg-white" />
+              <Input value={name} onChange={(e) => setName(e.target.value)} className="bg-white" required />
             </div>
             <div>
-              <label className="text-sm text-gray-600">Phone</label>
-              <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="bg-white" />
+              <label className="text-sm text-gray-600">Email</label>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-white" required placeholder="For order confirmation" />
             </div>
+          </div>
+          <div>
+            <label className="text-sm text-gray-600">Phone</label>
+            <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="bg-white" required />
           </div>
           <div>
             <label className="text-sm text-gray-600">Address Line 1</label>
-            <Input value={address1} onChange={(e) => setAddress1(e.target.value)} className="bg-white" />
+            <Input value={address1} onChange={(e) => setAddress1(e.target.value)} className="bg-white" required />
           </div>
           <div>
-            <label className="text-sm text-gray-600">Address Line 2</label>
+            <label className="text-sm text-gray-600">Address Line 2 (Optional)</label>
             <Input value={address2} onChange={(e) => setAddress2(e.target.value)} className="bg-white" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -65,6 +109,8 @@ export default function CheckoutPage() {
                 <option>Lahore</option>
                 <option>Karachi</option>
                 <option>Islamabad</option>
+                <option>Rawalpindi</option>
+                <option>Faisalabad</option>
               </select>
             </div>
             <div>
@@ -88,25 +134,29 @@ export default function CheckoutPage() {
           <div>
             <label className="text-sm text-gray-600">Payment</label>
             <div className="mt-2 grid grid-cols-2 gap-3">
-              <label className="flex items-center gap-2 rounded-md border px-3 py-2 cursor-pointer">
+              <label className="flex items-center gap-2 rounded-md border px-3 py-2 cursor-pointer bg-blue-50 border-blue-200">
                 <input type="radio" name="payment" checked={payment === "COD"} onChange={() => setPayment("COD")} />
-                <span>Cash on Delivery (Lahore)</span>
+                <span className="font-medium">Cash on Delivery</span>
               </label>
-              <label className="flex items-center gap-2 rounded-md border px-3 py-2 cursor-pointer">
-                <input type="radio" name="payment" checked={payment === "Card"} onChange={() => setPayment("Card")} />
-                <span>Credit/Debit Card</span>
+              <label className="flex items-center gap-2 rounded-md border px-3 py-2 cursor-pointer opacity-60 cursor-not-allowed">
+                <input type="radio" name="payment" disabled />
+                <span>Online Payment (Coming Soon)</span>
               </label>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <Button type="submit" disabled={!canPlace} className="bg-primary text-primary-foreground">Place Order</Button>
+            <Button type="submit" disabled={!canPlace || loading} className="bg-primary text-primary-foreground min-w-[140px]">
+              {loading ? "Placing Order..." : "Place Order"}
+            </Button>
             <Link href="/cart" className="text-sm text-gray-600">Back to Cart</Link>
           </div>
 
           {placed && (
-            <div className="rounded-md border bg-green-50 text-green-700 p-3 text-sm">
-              Order placed (stub). COD selected. We deliver to {city}.
+            <div className="rounded-md border bg-green-50 text-green-700 p-4 text-sm mt-4">
+              <p className="font-bold text-lg">Order Placed Successfully!</p>
+              <p>Thank you, {name}. We have received your order.</p>
+              <p>We will contact you at {phone} for confirmation.</p>
             </div>
           )}
         </form>

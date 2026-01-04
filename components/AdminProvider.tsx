@@ -199,6 +199,29 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
         console.error("Failed to sync DB products", e)
       }
 
+      // Fetch Orders
+      try {
+        const ordRes = await fetch("/api/admin/orders")
+        if (ordRes.ok) {
+          const dbOrders = await ordRes.json()
+          dbOrders.forEach((o: any) => {
+            const existing = loadedStore.orders.find(x => x.id === o.id)
+            if (!existing) {
+              loadedStore.orders.push({
+                id: o.id,
+                status: o.status as any,
+                items: o.items as any,
+                total: o.total,
+                placedAt: o.placedAt || o.createdAt,
+                note: o.note
+              })
+            }
+          })
+        }
+      } catch (e) {
+        console.error("Failed to sync DB orders", e)
+      }
+
       setStoreState(loadedStore)
       save(loadedStore)
     })()
