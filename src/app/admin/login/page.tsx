@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,6 +14,8 @@ export default function AdminLoginPage() {
     const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const router = useRouter()
+    const { update } = useSession()
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -24,23 +27,31 @@ export default function AdminLoginPage() {
             const result = await signIn("credentials", {
                 email,
                 password,
-                redirect: false, // Handle redirect manually
+                redirect: false,
             })
 
             console.log('[Admin Login] signIn result:', result)
 
             if (result?.error) {
                 console.error('[Admin Login] Login error:', result.error)
-                toast.error("Invalid credentials: " + result.error)
+                toast.error("Invalid credentials")
                 setLoading(false)
             } else if (result?.ok) {
-                console.log('[Admin Login] Login successful, redirecting...')
+                console.log('[Admin Login] Login successful, updating session...')
                 toast.success("Login successful!")
-                // Force hard redirect
-                window.location.href = "/admin"
+
+                // Update the session to ensure it's loaded
+                await update()
+
+                // Small delay to ensure session is fully established
+                setTimeout(() => {
+                    console.log('[Admin Login] Redirecting to /admin')
+                    router.push("/admin")
+                    router.refresh()
+                }, 500)
             } else {
                 console.error('[Admin Login] Unexpected result:', result)
-                toast.error("Login failed - unexpected result")
+                toast.error("Login failed")
                 setLoading(false)
             }
         } catch (error: any) {

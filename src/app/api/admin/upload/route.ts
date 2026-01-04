@@ -1,41 +1,56 @@
 import { NextRequest, NextResponse } from "next/server"
-import fs from "fs"
-import path from "path"
-import { put } from "@vercel/blob"
+import ImageKit from "imagekit"
 
 export const runtime = "nodejs"
 
-const uploadsDir = path.join(process.cwd(), "public", "uploads")
+// Initialize ImageKit
+const imagekit = new ImageKit({
+  publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || "",
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY || "",
+  urlEndpoint: process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || "",
+})
 
 export async function POST(req: NextRequest) {
+  // 1. Authentication Check
   const token = req.headers.get("x-admin-token") || ""
   const required = process.env.ADMIN_TOKEN
-  if (required && token !== required) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
-
-  const form = await req.formData()
-  const file = form.get("file") as File | null
-  if (!file) return NextResponse.json({ error: "no_file" }, { status: 400 })
-  const type = file.type || ""
-  if (!/^image\/(png|jpeg|jpg|webp|gif)$/i.test(type)) return NextResponse.json({ error: "invalid_type" }, { status: 400 })
+  if (required && token !== required) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 })
+  }
 
   try {
-    const safeName = (file.name || "image").replace(/[^a-z0-9\-_.]/gi, "_")
-    const key = `uploads/${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName}`
-    const blob = await put(key, file, { access: "public" })
-    return NextResponse.json({ url: blob.url })
-  } catch {
-    try {
-      const buff = Buffer.from(await file.arrayBuffer())
-      const ext = type.split("/")[1].toLowerCase().replace("jpeg", "jpg")
-      const safeName = (file.name || "image").replace(/[^a-z0-9\-_.]/gi, "_")
-      const name = `${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName}.${ext}`
-      fs.mkdirSync(uploadsDir, { recursive: true })
-      const filePath = path.join(uploadsDir, name)
-      fs.writeFileSync(filePath, buff)
-      const url = `/uploads/${name}`
-      return NextResponse.json({ url })
-    } catch {
-      return NextResponse.json({ error: "upload_failed" }, { status: 500 })
+    // 2. Parse Form Data
+    const form = await req.formData()
+    const file = form.get("file") as File | null
+
+    if (!file) {
+      return NextResponse.json({ error: "no_file" }, { status: 400 })
     }
+
+    // 3. Validation
+    const type = file.type || ""
+    if (!/^image\/(png|jpeg|jpg|webp|gif)$/i.test(type)) {
+      return NextResponse.json({ error: "invalid_type" }, { status: 400 })
+    }
+
+    // 4. Convert File to Buffer
+    const buffer = Buffer.from(await file.arrayBuffer())
+
+    // 5. Upload to ImageKit
+    const result = await imagekit.upload({
+      file: buffer,
+      fileName: file.name || "image.jpg",
+      folder: "/products", // Optional: organize in folders
+    })
+
+    // 6. Return the URL
+    return NextResponse.json({ url: result.url })
+
+  } catch (error: any) {
+    console.error("Upload Error:", error)
+    return NextResponse.json(
+      { error: "upload_failed", details: error.message },
+      { status: 500 }
+    )
   }
 }

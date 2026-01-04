@@ -58,11 +58,18 @@ export const authOptions: NextAuthOptions = {
         },
         async session({ session, token }) {
             console.log('[NextAuth Session] Called with token role:', token.role)
+
             if (session.user) {
-                (session.user as any).role = token.role
-                    (session.user as any).id = token.id
+                return {
+                    ...session,
+                    user: {
+                        ...session.user,
+                        id: token.id as string,
+                        role: token.role as string
+                    }
+                }
             }
-            console.log('[NextAuth Session] Returning session with user role:', (session.user as any)?.role)
+
             return session
         }
     }
