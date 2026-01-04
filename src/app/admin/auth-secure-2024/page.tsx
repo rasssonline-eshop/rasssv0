@@ -64,10 +64,11 @@ export default function AdminLoginPage() {
                 toast.error("Invalid credentials")
             } else if (result?.ok) {
                 toast.success("Login successful!")
-                // Small delay to ensure session is set
+                // Use window.location for hard redirect (works better in production)
                 setTimeout(() => {
-                    router.push("/admin")
-                    router.refresh()
+                    if (typeof window !== 'undefined') {
+                        window.location.href = "/admin"
+                    }
                 }, 500)
             } else {
                 toast.error("Login failed - please try again")
