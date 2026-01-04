@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { usePathname } from "next/navigation"
 import { useI18n } from "@/components/I18nProvider"
+import { useAdmin } from "@/components/AdminProvider"
 
-const categories = [
+const defaultCategories = [
   "Fragrances",
   "Makeup",
   "Baby Care & Diapers",
@@ -25,6 +26,13 @@ const categories = [
 export default function Navigation() {
   const pathname = usePathname()
   const { t } = useI18n()
+  const { store } = useAdmin()
+
+  // Use store categories if available, otherwise fallback to defaults (only names)
+  const categoryNames = store.categories.length > 0
+    ? store.categories.map(c => c.name)
+    : defaultCategories
+
   const labelFor = (cat: string) => {
     switch (cat) {
       case "Fragrances": return t("cat.fragrances")
@@ -69,9 +77,13 @@ export default function Navigation() {
               </button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="start" className="w-48">
-              {categories.map((cat) => (
-                <DropdownMenuItem key={cat}>{cat}</DropdownMenuItem>
+            <DropdownMenuContent align="start" className="w-48 max-h-[80vh] overflow-y-auto">
+              {categoryNames.map((cat) => (
+                <DropdownMenuItem key={cat} asChild>
+                  <Link href={`/category/${encodeURIComponent(cat)}`} className="w-full cursor-pointer">
+                    {cat}
+                  </Link>
+                </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>

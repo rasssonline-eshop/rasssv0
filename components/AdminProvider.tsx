@@ -29,7 +29,9 @@ export type AdminProduct = {
   metaTitle?: string
   metaDescription?: string
   createdAt?: string
+
   updatedAt?: string
+  isFeatured?: boolean
 }
 
 export type AdminSlide = { id: string, title: string, subtitle: string, image: string }
@@ -163,6 +165,13 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     const list = store.productsByCategory[p.category] || []
     const s = { ...store, productsByCategory: { ...store.productsByCategory, [p.category]: [...list.filter(x => x.id !== p.id), p] } }
     setStore(s)
+
+    // Sync to Prisma (for Featured Products etc)
+    fetch("/api/admin/products", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(p)
+    }).catch(e => console.error("Prisma sync failed", e))
   }
   const updateProduct = (id: string, patch: Partial<AdminProduct>) => {
     const category = patch.category || Object.keys(store.productsByCategory).find(k => (store.productsByCategory[k] || []).some(x => x.id === id))
