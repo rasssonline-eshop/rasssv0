@@ -18,7 +18,7 @@ export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
         const timer = setTimeout(() => {
             if (!session) {
                 console.log('[AdminAuthGuard] No session, redirecting to login')
-                router.push("/admin/auth-secure-2024")
+                router.push("/admin/login")
                 return
             }
 
@@ -27,7 +27,7 @@ export function AdminAuthGuard({ children }: { children: React.ReactNode }) {
 
             if (userRole !== "admin") {
                 console.log('[AdminAuthGuard] Not admin, redirecting to login')
-                router.push("/admin/auth-secure-2024")
+                router.push("/admin/login")
             } else {
                 console.log('[AdminAuthGuard] Admin access granted')
                 setIsChecking(false)
