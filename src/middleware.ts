@@ -12,8 +12,8 @@ export async function middleware(request: NextRequest) {
 
     // Protect /admin routes
     if (pathname.startsWith('/admin')) {
-        // Allow access to admin login page
-        if (pathname === '/admin/login') {
+        // Allow access to secret admin login page
+        if (pathname === '/admin/auth-secure-2024') {
             // If already logged in as admin, redirect to dashboard
             if (token?.role === 'admin') {
                 return NextResponse.redirect(new URL('/admin', request.url))
@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
 
         // For all other admin routes, check if user is admin
         if (!token || token.role !== 'admin') {
-            return NextResponse.redirect(new URL('/admin/login', request.url))
+            return NextResponse.redirect(new URL('/admin/auth-secure-2024', request.url))
         }
     }
 
