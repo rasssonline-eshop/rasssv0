@@ -31,6 +31,7 @@ export default function NewProductPage() {
         status: "active",
         metaTitle: "",
         metaDescription: "",
+        isFeatured: false,
     })
 
     const [images, setImages] = useState<string[]>([])
@@ -105,6 +106,7 @@ export default function NewProductPage() {
             metaDescription: formData.metaDescription || undefined,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            isFeatured: formData.isFeatured,
         }
 
         addProduct(product as any)
@@ -308,7 +310,19 @@ export default function NewProductPage() {
                                             {cat.name}
                                         </option>
                                     ))}
+
                                 </select>
+                            </div>
+                            <div className="flex items-center space-x-2 pt-8">
+                                <input
+                                    type="checkbox"
+                                    id="isFeatured"
+                                    name="isFeatured"
+                                    checked={formData.isFeatured}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, isFeatured: e.target.checked }))}
+                                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                />
+                                <Label htmlFor="isFeatured">Featured Product</Label>
                             </div>
                             <div>
                                 <Label htmlFor="stock">Stock Quantity *</Label>
@@ -393,6 +407,6 @@ export default function NewProductPage() {
                     </Link>
                 </div>
             </form>
-        </div>
+        </div >
     )
 }

@@ -82,6 +82,7 @@ model Product {
   stock             Int      @default(0)
   lowStockThreshold Int      @default(10)
   status            String   @default("active") // active, inactive
+  isFeatured        Boolean  @default(false)
   metaTitle         String?
   metaDescription   String?
   rating            Float?   @default(4.3)

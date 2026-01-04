@@ -4,8 +4,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useI18n } from "@/components/I18nProvider"
+import { useAdmin } from "@/components/AdminProvider"
 
-const categories = [
+const defaultCategories = [
   "Fragrances",
   "Makeup",
   "Baby Care & Diapers",
@@ -19,6 +20,13 @@ const categories = [
 export default function Navigation() {
   const pathname = usePathname()
   const { t } = useI18n()
+  const { store } = useAdmin()
+
+  // Use store categories if available, otherwise fallback to defaults (only names)
+  const categoryNames = store.categories.length > 0
+    ? store.categories.map(c => c.name)
+    : defaultCategories
+
   const labelFor = (cat: string) => {
     switch (cat) {
       case "Fragrances": return t("cat.fragrances")
@@ -32,6 +40,7 @@ export default function Navigation() {
       default: return cat
     }
   }
+
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-[calc(var(--header-height,56px)-6px)] z-40 shadow-sm">
       <div className="px-4">
@@ -43,9 +52,13 @@ export default function Navigation() {
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              {categories.map((cat) => (
-                <DropdownMenuItem key={cat}>{cat}</DropdownMenuItem>
+            <DropdownMenuContent align="start" className="w-48 max-h-[80vh] overflow-y-auto">
+              {categoryNames.map((cat) => (
+                <DropdownMenuItem key={cat} asChild>
+                  <Link href={`/category/${encodeURIComponent(cat)}`} className="w-full cursor-pointer">
+                    {labelFor(cat)}
+                  </Link>
+                </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -68,7 +81,7 @@ export default function Navigation() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="ml-auto hidden md:flex items-center gap-2 text-sm text-gray-600 hover:text-primary hover:bg-transparent">
-                <span>SERVICES TEST</span>
+                <span>SERVICES</span>
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -89,7 +102,7 @@ export default function Navigation() {
         </div>
         <div className="container py-1 overflow-x-auto no-scrollbar snap-x snap-mandatory">
           <div className="flex items-center gap-2 sm:gap-3 flex-nowrap">
-            {categories.map((cat) => {
+            {categoryNames.map((cat) => {
               const href = `/category/${encodeURIComponent(cat)}`
               const active = pathname?.startsWith(href)
               return (
