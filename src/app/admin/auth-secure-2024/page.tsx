@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,7 +10,6 @@ import { toast } from "sonner"
 import { Shield } from "lucide-react"
 
 export default function AdminLoginPage() {
-    const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -24,20 +22,12 @@ export default function AdminLoginPage() {
             const result = await signIn("credentials", {
                 email,
                 password,
-                redirect: false,
+                callbackUrl: "/admin",
+                redirect: true, // Let NextAuth handle the redirect
             })
 
-            if (result?.error) {
-                toast.error("Invalid credentials")
-                setLoading(false)
-            } else if (result?.ok) {
-                toast.success("Login successful!")
-                // Hard redirect to admin dashboard
-                window.location.href = "/admin"
-            } else {
-                toast.error("Login failed - please try again")
-                setLoading(false)
-            }
+            // If redirect is true, this code won't execute
+            // NextAuth will automatically redirect on success
         } catch (error: any) {
             toast.error("Login failed")
             console.error('Login error:', error)
