@@ -54,23 +54,15 @@ export default function AdminLoginPage() {
             })
 
             if (result?.error) {
-                toast.error("Invalid admin credentials")
+                toast.error("Invalid credentials")
+                setLoading(false)
             } else {
-                // Verify user is admin
-                const response = await fetch('/api/auth/session')
-                const session = await response.json()
-
-                if (session?.user?.role === 'admin') {
-                    toast.success("Admin login successful!")
-                    router.push("/admin")
-                    router.refresh()
-                } else {
-                    toast.error("Access denied. Admin privileges required.")
-                }
+                toast.success("Login successful!")
+                // Redirect to admin - middleware will verify role
+                window.location.href = "/admin"
             }
         } catch (error) {
             toast.error("Login failed")
-        } finally {
             setLoading(false)
         }
     }
