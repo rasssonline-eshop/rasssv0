@@ -47,23 +47,39 @@ export default function AdminLoginPage() {
         setLoading(true)
 
         try {
-            const result = await signIn("credentials", {
+            // Add timeout to prevent hanging
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Request timeout')), 15000)
+            )
+
+            const loginPromise = signIn("credentials", {
                 email,
                 password,
                 redirect: false,
             })
 
+            const result = await Promise.race([loginPromise, timeoutPromise]) as any
+
             if (result?.error) {
                 toast.error("Invalid credentials")
-                setLoading(false)
-            } else {
+            } else if (result?.ok) {
                 toast.success("Login successful!")
-                // Redirect to admin - middleware will verify role
-                router.push("/admin")
-                router.refresh()
+                // Small delay to ensure session is set
+                setTimeout(() => {
+                    router.push("/admin")
+                    router.refresh()
+                }, 500)
+            } else {
+                toast.error("Login failed - please try again")
             }
-        } catch (error) {
-            toast.error("Login failed")
+        } catch (error: any) {
+            if (error.message === 'Request timeout') {
+                toast.error("Login timeout - check your connection")
+            } else {
+                toast.error("Login failed")
+            }
+            console.error('Login error:', error)
+        } finally {
             setLoading(false)
         }
     }
