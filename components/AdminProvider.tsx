@@ -29,7 +29,6 @@ export type AdminProduct = {
   metaTitle?: string
   metaDescription?: string
   createdAt?: string
-
   updatedAt?: string
   isFeatured?: boolean
 }
@@ -129,15 +128,82 @@ function save(s: AdminStore) {
 
 export default function AdminProvider({ children }: { children: React.ReactNode }) {
   const [store, setStoreState] = React.useState<AdminStore>(defaultStore)
+
   React.useEffect(() => {
     ; (async () => {
+      let loadedStore = defaultStore
+      // 1. Load from API or LocalStorage (Legacy/Ephemeral Store)
       try {
         const res = await fetch('/api/admin/store', { method: 'GET', headers: { accept: 'application/json' }, cache: 'no-store' })
-        if (res.ok) { const json = await res.json(); setStoreState(json); save(json); return }
-      } catch { }
-      setStoreState(load())
+        if (res.ok) {
+          loadedStore = await res.json()
+        } else {
+          loadedStore = load()
+        }
+      } catch {
+        loadedStore = load()
+      }
+
+      // 2. Hydrate from Database (Persistent Store)
+      // This ensures that even if local/API store is wiped, we recover the data from the DB.
+
+      // Fetch Categories
+      try {
+        const catRes = await fetch("/api/categories")
+        if (catRes.ok) {
+          const dbCats = await catRes.json()
+          const existingNames = new Set(loadedStore.categories.map(c => c.name))
+          const newCats = dbCats.filter((c: any) => !existingNames.has(c.name)).map((c: any) => ({
+            name: c.name,
+            image: c.image,
+            comingSoon: c.comingSoon
+          }))
+          if (newCats.length > 0) {
+            loadedStore.categories = [...loadedStore.categories, ...newCats]
+          }
+        }
+      } catch (e) {
+        console.error("Failed to sync DB categories", e)
+      }
+
+      // Fetch Products
+      try {
+        const prodRes = await fetch("/api/products?limit=1000")
+        if (prodRes.ok) {
+          const dbProds = await prodRes.json()
+          dbProds.forEach((p: any) => {
+            const cat = p.category
+            if (!loadedStore.productsByCategory[cat]) {
+              loadedStore.productsByCategory[cat] = []
+            }
+            // Avoid duplicates
+            const existing = loadedStore.productsByCategory[cat].find(x => x.id === p.id)
+            if (!existing) {
+              loadedStore.productsByCategory[cat].push({
+                id: p.id,
+                name: p.name,
+                slug: p.slug,
+                price: p.price,
+                oldPrice: p.oldPrice,
+                image: p.image,
+                category: p.category,
+                description: p.description,
+                brand: p.brand,
+                rating: p.rating,
+                isFeatured: p.isFeatured
+              })
+            }
+          })
+        }
+      } catch (e) {
+        console.error("Failed to sync DB products", e)
+      }
+
+      setStoreState(loadedStore)
+      save(loadedStore)
     })()
   }, [])
+
   const setStore = React.useCallback((s: AdminStore) => {
     setStoreState(s)
     save(s)
