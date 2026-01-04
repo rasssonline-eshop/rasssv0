@@ -2,10 +2,19 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAdmin } from "@/components/AdminProvider"
+import { AdminAuthGuard } from "@/src/components/AdminAuthGuard"
 import { DollarSign, Package, ShoppingCart, TrendingUp, AlertCircle } from "lucide-react"
 import { useMemo } from "react"
 
 export default function AdminDashboard() {
+  return (
+    <AdminAuthGuard>
+      <DashboardContent />
+    </AdminAuthGuard>
+  )
+}
+
+function DashboardContent() {
   const { store } = useAdmin()
 
   // Calculate metrics
