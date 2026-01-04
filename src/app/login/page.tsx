@@ -41,8 +41,20 @@ export default function LoginPage() {
             if (result?.error) {
                 toast.error("Invalid email or password")
             } else {
-                toast.success("Login successful!")
-                router.push("/")
+                // Check user role and redirect accordingly
+                const response = await fetch('/api/auth/session')
+                const session = await response.json()
+
+                if (session?.user?.role === 'admin') {
+                    toast.info("Redirecting to admin panel...")
+                    router.push("/admin")
+                } else if (session?.user?.role === 'seller') {
+                    toast.success("Login successful!")
+                    router.push("/profile/seller")
+                } else {
+                    toast.success("Login successful!")
+                    router.push("/")
+                }
                 router.refresh()
             }
         } catch (error) {
