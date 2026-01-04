@@ -24,16 +24,28 @@ export default function AdminLoginPage() {
             const result = await signIn("credentials", {
                 email,
                 password,
-                callbackUrl: "/admin",
-                redirect: true, // Let NextAuth handle the redirect
+                redirect: false, // Handle redirect manually
             })
 
             console.log('[Admin Login] signIn result:', result)
-            // If redirect is true, this code won't execute
-            // NextAuth will automatically redirect on success
+
+            if (result?.error) {
+                console.error('[Admin Login] Login error:', result.error)
+                toast.error("Invalid credentials: " + result.error)
+                setLoading(false)
+            } else if (result?.ok) {
+                console.log('[Admin Login] Login successful, redirecting...')
+                toast.success("Login successful!")
+                // Force hard redirect
+                window.location.href = "/admin"
+            } else {
+                console.error('[Admin Login] Unexpected result:', result)
+                toast.error("Login failed - unexpected result")
+                setLoading(false)
+            }
         } catch (error: any) {
-            console.error('[Admin Login] Error:', error)
-            toast.error("Login failed")
+            console.error('[Admin Login] Exception:', error)
+            toast.error("Login failed: " + error.message)
             setLoading(false)
         }
     }
