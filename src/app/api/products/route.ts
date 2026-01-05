@@ -20,6 +20,15 @@ export async function GET(req: NextRequest) {
             where.category = category
         }
 
+        const search = searchParams.get("search")
+        if (search) {
+            where.OR = [
+                { name: { contains: search, mode: "insensitive" } },
+                { description: { contains: search, mode: "insensitive" } },
+                { brand: { contains: search, mode: "insensitive" } }
+            ]
+        }
+
         const products = await prisma.product.findMany({
             where,
             orderBy: { createdAt: "desc" },

@@ -32,14 +32,40 @@ export default function AdminProvider({ children }: { children: ReactNode }) {
 
     const fetchStore = async () => {
         try {
-            const res = await fetch("/api/admin/store")
-            if (res.ok) {
-                const data = await res.json()
-                setStore(data)
+            // 1. Get base store (mock/json data for other fields like brands/slides)
+            let data: Store = { categories: [] }
+            try {
+                const res = await fetch("/api/admin/store")
+                if (res.ok) {
+                    data = await res.json()
+                }
+            } catch (e) {
+                console.error("Admin store fetch error (using empty defaults)", e)
             }
+
+            // 2. Override categories from Real DB (Prisma)
+            // This ensures seeded categories appear instead of the single mock "Skin Care"
+            try {
+                const catRes = await fetch("/api/categories")
+                if (catRes.ok) {
+                    const dbCats = await catRes.json()
+                    if (Array.isArray(dbCats) && dbCats.length > 0) {
+                        data.categories = dbCats.map((c: any) => ({
+                            name: c.name,
+                            image: c.image, // Ensure image is passed if it exists
+                            comingSoon: c.comingSoon,
+                            subcategories: c.subcategories || []
+                        }))
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to fetch live categories from DB", e)
+            }
+
+            // 3. Update State
+            setStore(data)
         } catch (error) {
             console.error("Failed to fetch store data:", error)
-            // Quiet fail - keep default state
         } finally {
             setLoading(false)
         }

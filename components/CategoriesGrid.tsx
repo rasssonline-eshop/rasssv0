@@ -1,5 +1,5 @@
 "use client"
-
+import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
@@ -136,14 +136,18 @@ const categoryImages: Record<string, string> = {
 
 export default function CategoriesGrid() {
   const { store } = useAdmin()
+  const [showAll, setShowAll] = useState(false)
+
   const adminCats = store.categories.length ? store.categories.map(c => ({ name: c.name, subcategories: c.subcategories || [], comingSoon: c.comingSoon })) : categories
   const sorted = [...adminCats].sort((a, b) => Number(!!a.comingSoon) - Number(!!b.comingSoon))
+  const displayLimit = showAll ? sorted.length : 12
+
   return (
     <section id="categories" className="py-12 bg-gray-50">
       <div className="container">
         <h2 className="text-2xl font-bold mb-8">Categories</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {sorted.map((category) => (
+          {sorted.slice(0, displayLimit).map((category) => (
             <Link key={category.name} href={`/category/${category.name}`}>
               <Card className="group bg-white rounded-xl border overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5 hover:ring-2 hover:ring-primary/30 active:scale-95 active:ring-primary/40 cursor-pointer h-full">
                 <div className="relative aspect-[4/3] overflow-hidden">
@@ -178,6 +182,16 @@ export default function CategoriesGrid() {
             </Link>
           ))}
         </div>
+        {sorted.length > 12 && (
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="px-6 py-2 border rounded-full text-sm font-medium hover:bg-white hover:shadow-md transition-all bg-white text-gray-700 hover:text-primary"
+            >
+              {showAll ? "Show Less" : "View All Categories"}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   )

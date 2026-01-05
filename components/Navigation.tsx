@@ -186,6 +186,23 @@ export default function Navigation() {
           </Link>
         </div>
 
+        {/* Mobile Category List */}
+        <div className="sm:hidden py-2 overflow-x-auto no-scrollbar whitespace-nowrap">
+          <div className="flex items-center gap-2 px-1">
+            {categoryNames.map((cat) => (
+              <Link
+                key={cat}
+                href={`/category/${encodeURIComponent(cat)}`}
+                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm border transition-colors ${pathname?.includes(encodeURIComponent(cat))
+                    ? 'bg-primary text-white border-primary shadow-sm'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-transparent'
+                  }`}
+              >
+                {labelFor(cat)}
+              </Link>
+            ))}
+          </div>
+        </div>
 
       </div>
     </nav >
