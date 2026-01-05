@@ -86,7 +86,7 @@ export default function FeaturedProducts() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     {products.map((product) => (
-                        <Card key={product.id} className="group border-0 shadow-lg shadow-gray-100 hover:shadow-xl hover:shadow-gray-200 transition-all duration-500 overflow-hidden bg-white h-full flex flex-col">
+                        <Card key={product.id} className="group border-0 shadow-lg shadow-gray-100 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-500 overflow-hidden bg-white h-full flex flex-col rounded-xl hover:ring-2 hover:ring-amber-400/30">
                             <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
                                 {product.image ? (
                                     <img
@@ -101,14 +101,14 @@ export default function FeaturedProducts() {
                                     </div>
                                 )}
                                 <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
-                                    <Badge className="bg-white/90 text-gray-900 border-0 shadow-sm backdrop-blur-sm hover:bg-white">
+                                    <Badge className="bg-amber-500 text-white border-0 shadow-sm">
                                         Featured
                                     </Badge>
                                 </div>
                                 {/* Quick Add Button Overlay */}
                                 <div className="absolute inset-x-4 bottom-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-10">
                                     <Button
-                                        className="w-full gap-2 shadow-lg bg-white text-gray-900 hover:bg-gray-50 border-0"
+                                        className="w-full gap-2 shadow-lg bg-amber-500 text-white hover:bg-amber-600 border-0"
                                         onClick={() => {
                                             addItem({
                                                 id: product.id,
@@ -118,7 +118,7 @@ export default function FeaturedProducts() {
                                                 slug: product.slug
                                             })
                                             toast.success("Added to cart", {
-                                                style: { background: '#10b981', color: 'white' }
+                                                style: { background: '#f59e0b', color: 'white' }
                                             })
                                         }}
                                     >
@@ -128,13 +128,13 @@ export default function FeaturedProducts() {
                                 </div>
                             </div>
 
-                            <CardContent className="p-5 flex-1 flex flex-col pt-6">
-                                <p className="text-xs font-semibold text-primary/80 uppercase tracking-widest mb-2">{product.category}</p>
-                                <h3 className="font-bold text-lg text-gray-900 line-clamp-2 mb-3 min-h-[3.5rem] group-hover:text-primary transition-colors">
+                            <CardContent className="p-5 flex-1 flex flex-col pt-6 border-t-2 border-amber-400/20">
+                                <p className="text-xs font-semibold text-amber-600 uppercase tracking-widest mb-2">{product.category}</p>
+                                <h3 className="font-bold text-lg text-gray-900 line-clamp-2 mb-3 min-h-[3.5rem] group-hover:text-amber-700 transition-colors">
                                     {product.name}
                                 </h3>
                                 <div className="mt-auto flex items-baseline gap-2">
-                                    <span className="font-bold text-xl text-primary">Rs {product.price.toLocaleString()}</span>
+                                    <span className="font-bold text-xl text-amber-600">Rs {product.price.toLocaleString()}</span>
                                 </div>
                             </CardContent>
                         </Card>

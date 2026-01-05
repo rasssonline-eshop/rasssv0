@@ -135,28 +135,32 @@ export default function CategoriesGrid() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {sorted.map((category) => (
             <Link key={category.name} to={`/category/${category.name}`}>
-              <Card className="group relative overflow-hidden border-0 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer h-full bg-white">
-                <div className="relative aspect-[4/3] overflow-hidden">
+              <Card className="group relative overflow-hidden border-2 border-transparent hover:border-teal-400/50 rounded-2xl shadow-md hover:shadow-xl hover:shadow-teal-500/10 transition-all duration-500 hover:-translate-y-1 cursor-pointer h-full bg-gradient-to-br from-white to-gray-50">
+                <div className="relative aspect-square overflow-hidden rounded-t-xl">
                   <img
                     src={(store.categories.find(x => x.name === category.name)?.image) || imageMap[category.name] || category.image || "/placeholder.svg"}
                     alt={category.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-teal-900/70 via-teal-900/30 to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-500" />
                   {category.comingSoon && (
                     <div className="absolute top-3 left-3 z-10">
-                      <Badge variant="secondary" className="bg-white/90 text-gray-800 border-0 shadow-sm backdrop-blur-sm">
+                      <Badge variant="secondary" className="bg-teal-500 text-white border-0 shadow-sm">
                         Coming Soon
                       </Badge>
                     </div>
                   )}
+                  {/* Category Icon Accent */}
+                  <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-teal-500/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100">
+                    <span className="text-white text-sm font-bold">{category.name.charAt(0)}</span>
+                  </div>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                  <h3 className="font-bold text-lg mb-1 drop-shadow-md">{category.name}</h3>
-                  <div className="flex flex-wrap gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">
+                <div className="p-4 bg-white border-t-2 border-teal-400/30">
+                  <h3 className="font-bold text-gray-900 mb-1 group-hover:text-teal-600 transition-colors">{category.name}</h3>
+                  <div className="flex flex-wrap gap-1.5">
                     {category.subcategories.slice(0, 2).map((sub) => (
-                      <span key={sub} className="text-xs bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                      <span key={sub} className="text-xs text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full">
                         {sub}
                       </span>
                     ))}
