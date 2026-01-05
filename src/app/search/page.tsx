@@ -8,10 +8,11 @@ import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { formatPKR } from "@/lib/utils"
 import * as React from "react"
+import { Suspense } from "react"
 import { useCart } from "@/components/CartProvider"
 import { Badge } from "@/components/ui/badge"
 
-export default function SearchPage() {
+function SearchResults() {
     const searchParams = useSearchParams()
     const query = searchParams.get("q") || ""
     const { addItem } = useCart()
@@ -119,5 +120,13 @@ export default function SearchPage() {
                 )}
             </div>
         </div>
+    )
+}
+
+export default function SearchPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen container py-8">Loading...</div>}>
+            <SearchResults />
+        </Suspense>
     )
 }
