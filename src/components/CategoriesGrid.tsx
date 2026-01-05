@@ -126,7 +126,7 @@ export default function CategoriesGrid() {
   const sorted = [...adminCats].sort((a, b) => Number(!!a.comingSoon) - Number(!!b.comingSoon))
   return (
     <section className="py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
+      <div className="container">
         <div className="text-center mb-12">
           <span className="text-primary font-medium tracking-wider uppercase text-sm">Browse</span>
           <h2 className="text-3xl md:text-4xl font-bold mt-2 text-gray-900">Shop by Category</h2>

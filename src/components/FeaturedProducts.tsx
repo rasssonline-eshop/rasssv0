@@ -46,7 +46,7 @@ export default function FeaturedProducts() {
     if (loading) {
         return (
             <section className="py-16 bg-white">
-                <div className="max-w-7xl mx-auto px-4">
+                <div className="container">
                     <div className="flex items-center justify-between mb-10">
                         <Skeleton className="h-10 w-64" />
                         <Skeleton className="h-6 w-24" />
@@ -72,7 +72,7 @@ export default function FeaturedProducts() {
 
     return (
         <section className="py-16 md:py-24 bg-white">
-            <div className="max-w-7xl mx-auto px-4 md:px-8">
+            <div className="container">
                 <div className="flex items-center justify-between mb-10">
                     <div>
                         <span className="text-primary font-medium tracking-wider uppercase text-sm">Curated for you</span>
