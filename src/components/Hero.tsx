@@ -32,36 +32,75 @@ export default function Hero() {
   const prev = () => setCurrent((current - 1 + slides.length) % slides.length)
 
   return (
-    <section className="bg-pink-50 py-8">
+    <section className="py-8 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="relative bg-gradient-to-r from-pink-200 to-pink-100 rounded-lg overflow-hidden h-96">
-          <img
-            src={slides[current].image || "/placeholder.svg"}
-            alt={slides[current].title}
-            className="w-full h-full object-cover opacity-40"
-          />
+        <div className="relative bg-black rounded-2xl overflow-hidden h-[500px] shadow-2xl group">
+          {/* Background Images with Fade Transition */}
+          {slides.map((slide, idx) => (
+            <div
+              key={slide.id}
+              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${idx === current ? "opacity-100" : "opacity-0"
+                }`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10" />
+              <img
+                src={slide.image || "/placeholder.svg"}
+                alt={slide.title}
+                className="w-full h-full object-cover transform transition-transform duration-[2000ms] group-hover:scale-105"
+              />
+            </div>
+          ))}
 
-          <div className="absolute inset-0 flex items-center justify-between px-8">
-            <Button size="icon" variant="ghost" onClick={prev} className="bg-white/80 hover:bg-white">
+          {/* Content Overlay */}
+          <div className="absolute inset-0 z-20 flex items-center justify-between px-4 md:px-12">
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={prev}
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white backdrop-blur-md hidden md:flex rounded-full h-12 w-12"
+            >
               <ChevronLeft className="w-6 h-6" />
             </Button>
 
-            <div className="text-center text-gray-800">
-              <h2 className="text-4xl font-bold mb-2">{slides[current].title}</h2>
-              <p className="text-lg">{slides[current].subtitle}</p>
+            <div className="text-center md:text-left text-white max-w-2xl mx-auto md:mx-0 animate-fade-in-up md:pl-12">
+              <span className="inline-block py-1 px-3 rounded-full bg-primary/20 border border-primary/30 text-primary-foreground text-sm font-medium mb-4 backdrop-blur-sm">
+                Rasss Exclusive
+              </span>
+              <h2 className="text-5xl md:text-7xl font-bold mb-4 tracking-tight leading-tight text-balance">
+                {slides[current].title}
+              </h2>
+              <p className="text-lg md:text-xl text-gray-200 mb-8 font-light max-w-lg leading-relaxed">
+                {slides[current].subtitle}
+              </p>
+              <div className="flex gap-4 justify-center md:justify-start">
+                <Button size="lg" className="rounded-full px-8 text-base shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+                  Shop Now
+                </Button>
+                <Button size="lg" variant="outline" className="rounded-full px-8 text-base bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white">
+                  Learn More
+                </Button>
+              </div>
             </div>
 
-            <Button size="icon" variant="ghost" onClick={next} className="bg-white/80 hover:bg-white">
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={next}
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white backdrop-blur-md hidden md:flex rounded-full h-12 w-12"
+            >
               <ChevronRight className="w-6 h-6" />
             </Button>
           </div>
 
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          {/* Indicators */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-30">
             {slides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrent(idx)}
-                className={`w-2 h-2 rounded-full transition ${idx === current ? "bg-gray-600 w-6" : "bg-gray-300"}`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${idx === current ? "bg-white w-8" : "bg-white/40 w-2 hover:bg-white/60"
+                  }`}
+                aria-label={`Go to slide ${idx + 1}`}
               />
             ))}
           </div>

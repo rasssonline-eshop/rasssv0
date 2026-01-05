@@ -42,20 +42,20 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-[calc(var(--header-height,56px)-6px)] z-40 shadow-sm">
+    <nav className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-[calc(var(--header-height,56px)-6px)] z-40 shadow-sm">
       <div className="px-4">
-        <div className="container hidden sm:flex items-center gap-4 sm:gap-6 py-2">
+        <div className="container hidden sm:flex items-center gap-4 sm:gap-6 py-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2 bg-transparent">
+              <Button variant="outline" className="gap-2 bg-transparent border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300">
                 {t("nav.shopByCategory")}
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-4 h-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48 max-h-[80vh] overflow-y-auto">
+            <DropdownMenuContent align="start" className="w-56 max-h-[80vh] overflow-y-auto p-2 animate-in slide-in-from-top-2 duration-200">
               {categoryNames.map((cat) => (
-                <DropdownMenuItem key={cat} asChild>
-                  <Link href={`/category/${encodeURIComponent(cat)}`} className="w-full cursor-pointer">
+                <DropdownMenuItem key={cat} asChild className="rounded-lg transition-colors duration-200">
+                  <Link href={`/category/${encodeURIComponent(cat)}`} className="w-full cursor-pointer py-2.5 px-3">
                     {labelFor(cat)}
                   </Link>
                 </DropdownMenuItem>
@@ -63,36 +63,36 @@ export default function Navigation() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link href="/flash-sales" className={`flex items-center gap-1 text-sm ${pathname === '/flash-sales' ? 'text-blue-600' : ''}`}>
+          <Link href="/flash-sales" className={`flex items-center gap-1.5 text-sm font-medium transition-all duration-300 hover:text-primary ${pathname === '/flash-sales' ? 'text-primary' : 'text-gray-600'}`}>
             <Zap className="w-4 h-4 text-yellow-500" />
             <span>{t("nav.flashSales")}</span>
           </Link>
 
-          <Link href="/global" className={`flex items-center gap-1 text-sm ${pathname === '/global' ? 'text-blue-600' : ''}`}>
+          <Link href="/global" className={`flex items-center gap-1.5 text-sm font-medium transition-all duration-300 hover:text-primary ${pathname === '/global' ? 'text-primary' : 'text-gray-600'}`}>
             <Globe className="w-4 h-4" />
             <span>{t("nav.global")}</span>
           </Link>
 
-          <Link href="/healthcare-center" className={`flex items-center gap-1 text-sm ${pathname === '/healthcare-center' ? 'text-blue-600' : ''}`}>
+          <Link href="/healthcare-center" className={`flex items-center gap-1.5 text-sm font-medium transition-all duration-300 hover:text-primary ${pathname === '/healthcare-center' ? 'text-primary' : 'text-gray-600'}`}>
             <Heart className="w-4 h-4 text-red-500" />
             <span>{t("nav.healthcareCenter")}</span>
           </Link>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="ml-auto hidden md:flex items-center gap-2 text-sm text-gray-600 hover:text-primary hover:bg-transparent">
+              <Button variant="ghost" className="ml-auto hidden md:flex items-center gap-2 text-sm text-gray-600 hover:text-primary hover:bg-transparent transition-colors duration-300">
                 <span>SERVICES</span>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-4 h-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem asChild>
-                <Link href="/e-services" className="w-full cursor-pointer">
+            <DropdownMenuContent align="end" className="w-56 p-2 animate-in slide-in-from-top-2 duration-200">
+              <DropdownMenuItem asChild className="rounded-lg transition-colors duration-200">
+                <Link href="/e-services" className="w-full cursor-pointer py-2.5 px-3">
                   {t("nav.eServices")}
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/login?tab=register&role=seller" className="w-full flex items-center gap-2 cursor-pointer">
+              <DropdownMenuItem asChild className="rounded-lg transition-colors duration-200">
+                <Link href="/login?tab=register&role=seller" className="w-full flex items-center gap-2 cursor-pointer py-2.5 px-3">
                   <Store className="w-4 h-4 text-purple-600" />
                   <span>{t("nav.sellWithRass")}</span>
                 </Link>
@@ -100,7 +100,7 @@ export default function Navigation() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="container py-1 overflow-x-auto no-scrollbar snap-x snap-mandatory">
+        <div className="container py-2 overflow-x-auto no-scrollbar snap-x snap-mandatory">
           <div className="flex items-center gap-2 sm:gap-3 flex-nowrap">
             {categoryNames.map((cat) => {
               const href = `/category/${encodeURIComponent(cat)}`
@@ -109,7 +109,9 @@ export default function Navigation() {
                 <Link
                   key={cat}
                   href={href}
-                  className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm border snap-start ${active ? 'bg-primary text-white border-primary hover:bg-primary/90' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                  className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium border snap-start transition-all duration-300 hover:scale-105 active:scale-95 ${active
+                    ? 'bg-primary text-white border-primary shadow-sm shadow-primary/20'
+                    : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:border-gray-300'}`}
                 >
                   {labelFor(cat)}
                 </Link>

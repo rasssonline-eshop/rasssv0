@@ -42,6 +42,8 @@ export const metadata: Metadata = {
   },
 }
 
+import { PageTransition } from '../components/PageTransition'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -62,7 +64,9 @@ export default function RootLayout({
               <AdminProvider>
                 <LocationProvider>
                   <CartProvider>
-                    {children}
+                    <PageTransition>
+                      {children}
+                    </PageTransition>
                     <CartDrawer />
                     <MobileNav />
                   </CartProvider>
