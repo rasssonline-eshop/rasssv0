@@ -22,6 +22,8 @@ interface AdminContextType {
     loading: boolean
     refreshStore: () => Promise<void>
     addProduct: (product: any) => Promise<void>
+    updateProduct: (id: string, product: any) => Promise<void>
+    removeProduct: (id: string) => Promise<void>
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined)
@@ -122,8 +124,44 @@ export default function AdminProvider({ children }: { children: ReactNode }) {
         }
     }
 
+    const updateProduct = async (id: string, product: any) => {
+        try {
+            const res = await fetch(`/api/admin/products/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(product)
+            })
+            if (res.ok) {
+                toast.success("Product updated successfully")
+                await refreshStore()
+            } else {
+                toast.error("Failed to update product")
+            }
+        } catch (e) {
+            console.error(e)
+            toast.error("Error updating product")
+        }
+    }
+
+    const removeProduct = async (id: string) => {
+        try {
+            const res = await fetch(`/api/admin/products/${id}`, {
+                method: "DELETE"
+            })
+            if (res.ok) {
+                toast.success("Product deleted successfully")
+                await refreshStore()
+            } else {
+                toast.error("Failed to delete product")
+            }
+        } catch (e) {
+            console.error(e)
+            toast.error("Error deleting product")
+        }
+    }
+
     return (
-        <AdminContext.Provider value={{ store, loading, refreshStore, addProduct }}>
+        <AdminContext.Provider value={{ store, loading, refreshStore, addProduct, updateProduct, removeProduct }}>
             {children}
         </AdminContext.Provider>
     )

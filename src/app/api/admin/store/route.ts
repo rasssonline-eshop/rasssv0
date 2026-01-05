@@ -25,24 +25,8 @@ async function getMongoCollection(): Promise<Collection<AdminStoreDoc> | null> {
   return mongoClient.db(mongoDb).collection<AdminStoreDoc>("admin_store")
 }
 const defaultStore = {
-  categories: [
-    { name: "Skin Care", image: "https://picsum.photos/seed/skincare/600/600", subcategories: ["Moisturizers", "Sunscreens", "Serums"] },
-  ],
-  productsByCategory: {
-    "Skin Care": [
-      {
-        id: "Skin Care:Demo Cream",
-        name: "Demo Cream",
-        slug: "demo-cream",
-        price: 1499,
-        oldPrice: 1999,
-        image: "https://picsum.photos/seed/demo-cream/800/800",
-        rating: 4.5,
-        brand: "Rasss",
-        category: "Skin Care",
-      },
-    ],
-  },
+  categories: [],
+  productsByCategory: {},
   slides: [
     { id: "Welcome", title: "Welcome to Rasss", subtitle: "Quality skincare products", image: "https://picsum.photos/seed/slide-welcome/1200/600" },
   ],
@@ -59,7 +43,7 @@ const defaultStore = {
     { id: "l1", type: "income", amount: 2998, note: "Demo sale", date: new Date().toISOString() },
     { id: "l2", type: "expense", amount: 500, note: "Packaging", date: new Date().toISOString() },
   ],
-  accountant: { name: "Demo Accountant", email: "accounting@example.com", phone: "+92-300-0000000", notes: "Monthly audit on 28th", lastAuditDate: new Date().toISOString().slice(0,10) },
+  accountant: { name: "Demo Accountant", email: "accounting@example.com", phone: "+92-300-0000000", notes: "Monthly audit on 28th", lastAuditDate: new Date().toISOString().slice(0, 10) },
   suppliers: [
     { id: "sup1", name: "Supplier One", email: "supplier1@example.com", phone: "+92-300-1111111" },
   ],
@@ -72,7 +56,7 @@ const defaultStore = {
 }
 
 function ensureDir() {
-  try { fs.mkdirSync(dataDir, { recursive: true }) } catch {}
+  try { fs.mkdirSync(dataDir, { recursive: true }) } catch { }
 }
 
 export async function GET() {
@@ -83,7 +67,7 @@ export async function GET() {
       if (doc && doc.data) return NextResponse.json(doc.data)
       if (doc) return NextResponse.json(doc)
     }
-  } catch {}
+  } catch { }
   try {
     const { blobs } = await list({ prefix: "admin/store.json" })
     const b = blobs.find(x => x.pathname === "admin/store.json") || blobs[0]
@@ -91,7 +75,7 @@ export async function GET() {
       const r = await fetch((b as any).downloadUrl || b.url)
       if (r.ok) { const json = await r.json(); return NextResponse.json(json) }
     }
-  } catch {}
+  } catch { }
   try {
     ensureDir()
     if (!fs.existsSync(dataFile)) return NextResponse.json(defaultStore)
@@ -115,11 +99,11 @@ export async function POST(req: NextRequest) {
         await col.updateOne({ _id: "store" }, { $set: { data: body, updatedAt: new Date() } }, { upsert: true })
         return NextResponse.json({ ok: true })
       }
-    } catch {}
+    } catch { }
     try {
       await put("admin/store.json", JSON.stringify(body), { access: "public", contentType: "application/json", addRandomSuffix: false })
       return NextResponse.json({ ok: true })
-    } catch {}
+    } catch { }
     try {
       ensureDir()
       fs.writeFileSync(dataFile, JSON.stringify(body, null, 2), "utf8")
