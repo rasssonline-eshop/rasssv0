@@ -32,19 +32,20 @@ export default function AdminProvider({ children }: { children: ReactNode }) {
 
     const fetchStore = async () => {
         try {
-            // 1. Get base store (mock/json data for other fields like brands/slides)
-            let data: Store = { categories: [] }
+            // 1. Get base store (mock/json data for other fields like brands/slides/settings)
+            let data: Store = { categories: [], productsByCategory: {} }
             try {
                 const res = await fetch("/api/admin/store")
                 if (res.ok) {
-                    data = await res.json()
+                    const mockData = await res.json()
+                    // Use mock data as base, but we will overwrite critical parts
+                    data = { ...data, ...mockData }
                 }
             } catch (e) {
                 console.error("Admin store fetch error (using empty defaults)", e)
             }
 
             // 2. Override categories from Real DB (Prisma)
-            // This ensures seeded categories appear instead of the single mock "Skin Care"
             try {
                 const catRes = await fetch("/api/categories")
                 if (catRes.ok) {
@@ -52,7 +53,7 @@ export default function AdminProvider({ children }: { children: ReactNode }) {
                     if (Array.isArray(dbCats) && dbCats.length > 0) {
                         data.categories = dbCats.map((c: any) => ({
                             name: c.name,
-                            image: c.image, // Ensure image is passed if it exists
+                            image: c.image,
                             comingSoon: c.comingSoon,
                             subcategories: c.subcategories || []
                         }))
@@ -62,7 +63,28 @@ export default function AdminProvider({ children }: { children: ReactNode }) {
                 console.error("Failed to fetch live categories from DB", e)
             }
 
-            // 3. Update State
+            // 3. Override Products from Real DB (Prisma)
+            try {
+                // Fetch a large number of products to populate the dashboard view
+                const prodRes = await fetch("/api/products?limit=2000")
+                if (prodRes.ok) {
+                    const products = await prodRes.json()
+                    if (Array.isArray(products)) {
+                        const grouped: Record<string, any[]> = {}
+                        products.forEach((p: any) => {
+                            if (p.category) {
+                                if (!grouped[p.category]) grouped[p.category] = []
+                                grouped[p.category].push(p)
+                            }
+                        })
+                        // Overwrite the mock products with Real DB products
+                        data.productsByCategory = grouped
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to sync products from DB", e)
+            }
+
             setStore(data)
         } catch (error) {
             console.error("Failed to fetch store data:", error)
