@@ -92,7 +92,7 @@ export default function Navigation() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/e-services" className="w-full flex items-center gap-2 cursor-pointer">
+                <Link href="/login?tab=register&role=seller" className="w-full flex items-center gap-2 cursor-pointer">
                   <Store className="w-4 h-4 text-purple-600" />
                   <span>{t("nav.sellWithRass")}</span>
                 </Link>

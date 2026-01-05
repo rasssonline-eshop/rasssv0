@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, Suspense, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,8 +11,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useI18n } from "@/components/I18nProvider"
 import { toast } from "sonner"
 
-export default function LoginPage() {
+function LoginForm() {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const { t } = useI18n()
     const [activeTab, setActiveTab] = useState<"login" | "register">("login")
     const [loading, setLoading] = useState(false)
@@ -26,6 +27,19 @@ export default function LoginPage() {
     const [registerEmail, setRegisterEmail] = useState("")
     const [registerPassword, setRegisterPassword] = useState("")
     const [registerRole, setRegisterRole] = useState<"customer" | "seller">("customer")
+
+    // Handle URL parameters
+    useEffect(() => {
+        const tab = searchParams.get("tab")
+        const role = searchParams.get("role")
+
+        if (tab === "register") {
+            setActiveTab("register")
+        }
+        if (role === "seller") {
+            setRegisterRole("seller")
+        }
+    }, [searchParams])
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -214,5 +228,13 @@ export default function LoginPage() {
                 </CardContent>
             </Card>
         </div>
+    )
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <LoginForm />
+        </Suspense>
     )
 }
