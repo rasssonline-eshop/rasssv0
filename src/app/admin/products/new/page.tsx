@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Upload, X } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
+import { ImageKitUploader } from "@/src/components/ImageKitUploader"
 
 export default function NewProductPage() {
     const router = useRouter()
@@ -35,7 +35,6 @@ export default function NewProductPage() {
     })
 
     const [images, setImages] = useState<string[]>([])
-    const [uploading, setUploading] = useState(false)
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target
@@ -47,36 +46,9 @@ export default function NewProductPage() {
         }))
     }
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files
-        if (!files) return
-
-        setUploading(true)
-        const newImages: string[] = []
-
-        for (const file of Array.from(files)) {
-            try {
-                // Convert image to base64 for immediate display and storage
-                const reader = new FileReader()
-                const base64Promise = new Promise<string>((resolve, reject) => {
-                    reader.onload = () => resolve(reader.result as string)
-                    reader.onerror = reject
-                    reader.readAsDataURL(file)
-                })
-
-                const base64 = await base64Promise
-                newImages.push(base64)
-            } catch (error) {
-                console.error('Upload failed:', error)
-                alert(`Failed to upload ${file.name}`)
-            }
-        }
-
-        setImages(prev => [...prev, ...newImages])
-        setUploading(false)
-
-        // Reset the input so the same file can be selected again if needed
-        e.target.value = ''
+    // Handle uploaded images from ImageKitUploader
+    const handleUpload = (urls: string[]) => {
+        setImages(prev => [...prev, ...urls])
     }
 
     const removeImage = (index: number) => {
@@ -245,45 +217,20 @@ export default function NewProductPage() {
                     </CardContent>
                 </Card>
 
-                {/* Images */}
+                {/* Images - Direct upload to ImageKit CDN */}
                 <Card>
                     <CardHeader>
                         <CardTitle>Product Images</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {images.map((image, index) => (
-                                <div key={index} className="relative group">
-                                    <Image
-                                        src={image}
-                                        alt={`Product ${index + 1}`}
-                                        width={200}
-                                        height={200}
-                                        className="rounded-lg object-cover w-full h-40"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => removeImage(index)}
-                                        className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            ))}
-                            <label className="border-2 border-dashed border-gray-300 rounded-lg h-40 flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
-                                <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                                <span className="text-sm text-gray-600">Upload Image</span>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    multiple
-                                    onChange={handleImageUpload}
-                                    className="hidden"
-                                    disabled={uploading}
-                                />
-                            </label>
-                        </div>
-                        {uploading && <p className="text-sm text-gray-600">Uploading...</p>}
+                    <CardContent>
+                        <ImageKitUploader
+                            folder="/products"
+                            images={images}
+                            onUpload={handleUpload}
+                            onRemove={removeImage}
+                            maxSizeMB={5}
+                            multiple
+                        />
                     </CardContent>
                 </Card>
 
