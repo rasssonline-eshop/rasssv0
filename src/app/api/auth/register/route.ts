@@ -29,14 +29,15 @@ export async function POST(req: NextRequest) {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10)
 
-        // Create user
+        // SECURITY: Always create as 'user' role - never allow admin registration
+        // Admin accounts must be created manually in the database
+        // Seller registration is coming soon
         const user = await prisma.user.create({
             data: {
                 name,
                 email,
                 password: hashedPassword,
-                role: role || "customer",
-                sellerStatus: role === "seller" ? "pending" : null
+                role: "user", // Always user, never admin
             }
         })
 

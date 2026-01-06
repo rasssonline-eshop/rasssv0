@@ -154,9 +154,6 @@ function LoginForm() {
                                 <Button type="submit" className="w-full" disabled={loading}>
                                     {loading ? "Logging in..." : "Login"}
                                 </Button>
-                                <p className="text-sm text-gray-500 text-center">
-                                    Test: admin@rasss.com / admin123
-                                </p>
                             </form>
                         </TabsContent>
 
@@ -198,25 +195,24 @@ function LoginForm() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Account Type</Label>
-                                    <div className="flex gap-4">
+                                    <div className="flex gap-4 items-center">
                                         <label className="flex items-center gap-2">
                                             <input
                                                 type="radio"
                                                 value="customer"
-                                                checked={registerRole === "customer"}
-                                                onChange={(e) => setRegisterRole(e.target.value as any)}
+                                                checked={true}
+                                                readOnly
                                             />
                                             <span>Customer</span>
                                         </label>
-                                        <label className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 text-gray-400">
                                             <input
                                                 type="radio"
-                                                value="seller"
-                                                checked={registerRole === "seller"}
-                                                onChange={(e) => setRegisterRole(e.target.value as any)}
+                                                disabled
                                             />
                                             <span>Seller</span>
-                                        </label>
+                                            <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Coming Soon</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <Button type="submit" className="w-full" disabled={loading}>
