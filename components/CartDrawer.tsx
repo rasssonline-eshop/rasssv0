@@ -22,25 +22,31 @@ export default function CartDrawer() {
             <div className="text-sm text-gray-600 py-8">Your cart is empty</div>
           ) : (
             <div className="space-y-3">
-              {items.map((item) => (
-                <div key={item.id} className="flex items-center gap-3 border rounded-md p-2 bg-white">
-                  <div className="relative w-16 h-16 rounded-md overflow-hidden bg-gray-100">
-                    {item.image && (
-                      <Image src={item.image} alt={item.name} fill className="object-cover" sizes="80px" />
-                    )}
+              {items.map((item) => {
+                const itemKey = item.variantId ? `${item.id}_${item.variantId}` : item.id
+                return (
+                  <div key={itemKey} className="flex items-center gap-3 border rounded-md p-2 bg-white">
+                    <div className="relative w-16 h-16 rounded-md overflow-hidden bg-gray-100">
+                      {item.image && (
+                        <Image src={item.image} alt={item.name} fill className="object-cover" sizes="80px" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-sm line-clamp-2">{item.name}</div>
+                      {item.variantName && (
+                        <div className="text-xs text-gray-500 mt-0.5">{item.variantName}</div>
+                      )}
+                      <div className="text-xs text-gray-600">{formatPKR(item.price)}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" onClick={() => updateQty(itemKey, item.quantity - 1)}>-</Button>
+                      <div className="w-8 text-center text-sm">{item.quantity}</div>
+                      <Button variant="outline" size="sm" onClick={() => updateQty(itemKey, item.quantity + 1)}>+</Button>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => removeItem(itemKey)}>Remove</Button>
                   </div>
-                  <div className="flex-1">
-                    <div className="font-medium text-sm line-clamp-2">{item.name}</div>
-                    <div className="text-xs text-gray-600">{formatPKR(item.price)}</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => updateQty(item.id, item.quantity - 1)}>-</Button>
-                    <div className="w-8 text-center text-sm">{item.quantity}</div>
-                    <Button variant="outline" size="sm" onClick={() => updateQty(item.id, item.quantity + 1)}>+</Button>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => removeItem(item.id)}>Remove</Button>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>

@@ -152,6 +152,10 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
         const catRes = await fetch("/api/categories")
         if (catRes.ok) {
           const dbCats = await catRes.json()
+          // Ensure categories array exists
+          if (!loadedStore.categories) {
+            loadedStore.categories = []
+          }
           const existingNames = new Set(loadedStore.categories.map(c => c.name))
           const newCats = dbCats.filter((c: any) => !existingNames.has(c.name)).map((c: any) => ({
             name: c.name,
@@ -171,6 +175,10 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
         const prodRes = await fetch("/api/products?limit=1000")
         if (prodRes.ok) {
           const dbProds = await prodRes.json()
+          // Ensure productsByCategory object exists
+          if (!loadedStore.productsByCategory) {
+            loadedStore.productsByCategory = {}
+          }
           dbProds.forEach((p: any) => {
             const cat = p.category
             if (!loadedStore.productsByCategory[cat]) {
@@ -204,6 +212,10 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
         const ordRes = await fetch("/api/admin/orders")
         if (ordRes.ok) {
           const dbOrders = await ordRes.json()
+          // Ensure orders array exists
+          if (!loadedStore.orders) {
+            loadedStore.orders = []
+          }
           dbOrders.forEach((o: any) => {
             const existing = loadedStore.orders.find(x => x.id === o.id)
             if (!existing) {

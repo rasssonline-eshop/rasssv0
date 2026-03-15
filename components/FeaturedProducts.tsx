@@ -22,12 +22,16 @@ interface Product {
 export default function FeaturedProducts() {
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
+    const [refreshKey, setRefreshKey] = useState(0)
     const { addItem } = useCart()
 
     useEffect(() => {
         async function fetchFeatured() {
             try {
-                const res = await fetch("/api/products?featured=true&limit=8")
+                // Add timestamp to prevent caching
+                const res = await fetch(`/api/products?featured=true&limit=8&t=${Date.now()}`, {
+                    cache: 'no-store'
+                })
                 if (res.ok) {
                     const data = await res.json()
                     setProducts(data)
@@ -39,6 +43,14 @@ export default function FeaturedProducts() {
             }
         }
         fetchFeatured()
+    }, [refreshKey])
+
+    // Auto-refresh every 30 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setRefreshKey(prev => prev + 1)
+        }, 30000)
+        return () => clearInterval(interval)
     }, [])
 
     if (loading) return null
