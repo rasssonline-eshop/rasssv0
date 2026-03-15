@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useAdmin } from "@/components/AdminProvider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,7 +13,7 @@ import { ImageKitUploader } from "@/src/components/ImageKitUploader"
 
 export default function NewProductPage() {
     const router = useRouter()
-    const { addProduct, store } = useAdmin()
+    const [categories, setCategories] = useState<string[]>([])
 
     const [formData, setFormData] = useState({
         name: "",
@@ -36,6 +35,21 @@ export default function NewProductPage() {
 
     const [images, setImages] = useState<string[]>([])
 
+    useEffect(() => {
+        async function fetchCategories() {
+            try {
+                const res = await fetch("/api/categories")
+                if (res.ok) {
+                    const cats = await res.json()
+                    setCategories(cats.map((c: any) => c.name))
+                }
+            } catch (error) {
+                console.error("Failed to fetch categories", error)
+            }
+        }
+        fetchCategories()
+    }, [])
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target
         setFormData(prev => ({
@@ -55,11 +69,10 @@ export default function NewProductPage() {
         setImages(prev => prev.filter((_, i) => i !== index))
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         const product = {
-            id: Math.random().toString(36).substr(2, 9),
             name: formData.name,
             slug: formData.slug,
             price: parseFloat(formData.price),
@@ -76,13 +89,28 @@ export default function NewProductPage() {
             costPrice: formData.costPrice ? parseFloat(formData.costPrice) : undefined,
             metaTitle: formData.metaTitle || undefined,
             metaDescription: formData.metaDescription || undefined,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
             isFeatured: formData.isFeatured,
         }
 
-        addProduct(product as any)
-        router.push('/admin/products')
+        try {
+            const res = await fetch('/api/admin/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(product)
+            })
+
+            if (res.ok) {
+                router.push('/admin/products')
+            } else {
+                const error = await res.json()
+                alert(`Failed to create product: ${error.error || 'Unknown error'}`)
+            }
+        } catch (error) {
+            console.error("Failed to create product", error)
+            alert("Failed to create product")
+        }
     }
 
     return (
@@ -252,9 +280,9 @@ export default function NewProductPage() {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                                 >
                                     <option value="">Select category</option>
-                                    {store.categories.map((cat) => (
-                                        <option key={cat.name} value={cat.name}>
-                                            {cat.name}
+                                    {categories.map((cat) => (
+                                        <option key={cat} value={cat}>
+                                            {cat}
                                         </option>
                                     ))}
 

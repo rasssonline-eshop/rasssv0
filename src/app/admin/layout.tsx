@@ -12,7 +12,9 @@ import {
     Warehouse,
     Settings,
     LogOut,
-    Menu
+    Menu,
+    Users,
+    Wallet
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
@@ -22,6 +24,9 @@ const navigation = [
     { name: "Products", href: "/admin/products", icon: Package },
     { name: "Categories", href: "/admin/categories", icon: FolderTree },
     { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
+    { name: "Sellers", href: "/admin/sellers", icon: Users },
+    { name: "Payouts", href: "/admin/payouts", icon: Wallet },
+    { name: "Payment Settings", href: "/admin/payment-settings", icon: Wallet },
     { name: "Inventory", href: "/admin/inventory", icon: Warehouse },
     { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
     { name: "Settings", href: "/admin/settings", icon: Settings },

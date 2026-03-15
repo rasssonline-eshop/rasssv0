@@ -1,7 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { useAdmin } from "@/components/AdminProvider"
+import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,32 +9,80 @@ import { Plus, Search, Pencil, Trash2, Eye } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
+type ProductWithOwner = {
+    id: string
+    name: string
+    slug: string
+    price: number
+    oldPrice?: number
+    image?: string
+    category: string
+    brand?: string
+    stock: number
+    status: string
+    owner: {
+        id: string
+        name: string | null
+        email: string
+        role: string
+    }
+}
+
 export default function ProductsPage() {
-    const { store, removeProduct } = useAdmin()
+    const [products, setProducts] = useState<ProductWithOwner[]>([])
+    const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")
     const [selectedCategory, setSelectedCategory] = useState<string>("all")
+    const [categories, setCategories] = useState<string[]>([])
 
-    // Get all products
-    const allProducts = useMemo(() => {
-        if (!store || !store.productsByCategory) return []
-        return Object.entries(store.productsByCategory).flatMap(([category, products]) =>
-            products.map(p => ({ ...p, category }))
-        )
-    }, [store.productsByCategory])
+    // Fetch products with owner information
+    useEffect(() => {
+        async function fetchProducts() {
+            try {
+                const res = await fetch('/api/admin/products')
+                if (res.ok) {
+                    const data = await res.json()
+                    setProducts(data)
+                    
+                    // Extract unique categories
+                    const uniqueCategories = Array.from(new Set(data.map((p: ProductWithOwner) => p.category)))
+                    setCategories(uniqueCategories as string[])
+                }
+            } catch (error) {
+                console.error("Failed to fetch products", error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchProducts()
+    }, [])
 
     // Filter products
     const filteredProducts = useMemo(() => {
-        return allProducts.filter(product => {
+        return products.filter(product => {
             const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase())
             const matchesCategory = selectedCategory === "all" || product.category === selectedCategory
             return matchesSearch && matchesCategory
         })
-    }, [allProducts, searchQuery, selectedCategory])
+    }, [products, searchQuery, selectedCategory])
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async (id: string) => {
         if (confirm("Are you sure you want to delete this product?")) {
-            removeProduct(id)
+            try {
+                const res = await fetch(`/api/admin/products/${id}`, {
+                    method: 'DELETE'
+                })
+                if (res.ok) {
+                    setProducts(products.filter(p => p.id !== id))
+                }
+            } catch (error) {
+                console.error("Failed to delete product", error)
+            }
         }
+    }
+
+    if (loading) {
+        return <div className="p-8">Loading products...</div>
     }
 
     return (
@@ -73,9 +120,9 @@ export default function ProductsPage() {
                             className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                         >
                             <option value="all">All Categories</option>
-                            {(store?.categories || []).map((cat) => (
-                                <option key={cat.name} value={cat.name}>
-                                    {cat.name}
+                            {categories.map((cat) => (
+                                <option key={cat} value={cat}>
+                                    {cat}
                                 </option>
                             ))}
                         </select>
@@ -105,6 +152,7 @@ export default function ProductsPage() {
                                     <tr className="border-b border-gray-200">
                                         <th className="text-left py-3 px-4 font-medium text-gray-700">Product</th>
                                         <th className="text-left py-3 px-4 font-medium text-gray-700">Category</th>
+                                        <th className="text-left py-3 px-4 font-medium text-gray-700">Owner</th>
                                         <th className="text-left py-3 px-4 font-medium text-gray-700">Price</th>
                                         <th className="text-left py-3 px-4 font-medium text-gray-700">Stock</th>
                                         <th className="text-left py-3 px-4 font-medium text-gray-700">Status</th>
@@ -138,6 +186,14 @@ export default function ProductsPage() {
                                             </td>
                                             <td className="py-4 px-4">
                                                 <div>
+                                                    <p className="font-medium text-gray-900">{product.owner.name || 'Unknown'}</p>
+                                                    <p className="text-sm text-gray-500">
+                                                        {product.owner.role === 'admin' ? 'Admin' : 'Seller'}
+                                                    </p>
+                                                </div>
+                                            </td>
+                                            <td className="py-4 px-4">
+                                                <div>
                                                     <p className="font-semibold">Rs {product.price.toLocaleString()}</p>
                                                     {product.oldPrice && (
                                                         <p className="text-sm text-gray-500 line-through">
@@ -148,14 +204,14 @@ export default function ProductsPage() {
                                             </td>
                                             <td className="py-4 px-4">
                                                 <span className={`
-                          ${(product as any).stock < 10 ? 'text-red-600' : 'text-gray-900'}
+                          ${product.stock < 10 ? 'text-red-600' : 'text-gray-900'}
                         `}>
-                                                    {(product as any).stock || 'N/A'}
+                                                    {product.stock}
                                                 </span>
                                             </td>
                                             <td className="py-4 px-4">
-                                                <Badge variant={(product as any).status === 'active' ? 'default' : 'secondary'}>
-                                                    {(product as any).status || 'active'}
+                                                <Badge variant={product.status === 'active' ? 'default' : 'secondary'}>
+                                                    {product.status}
                                                 </Badge>
                                             </td>
                                             <td className="py-4 px-4">

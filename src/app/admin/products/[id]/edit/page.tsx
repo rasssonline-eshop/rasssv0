@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { useAdmin } from "@/components/AdminProvider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,8 +14,8 @@ import { ImageKitUploader } from "@/src/components/ImageKitUploader"
 export default function EditProductPage() {
     const router = useRouter()
     const { id } = useParams()
-    const { updateProduct, store } = useAdmin()
     const [loading, setLoading] = useState(true)
+    const [categories, setCategories] = useState<string[]>([])
 
     const [formData, setFormData] = useState({
         name: "",
@@ -39,11 +38,12 @@ export default function EditProductPage() {
     const [images, setImages] = useState<string[]>([])
 
     useEffect(() => {
-        async function fetchProduct() {
+        async function fetchData() {
             try {
-                const res = await fetch(`/api/admin/products/${id}`)
-                if (res.ok) {
-                    const product = await res.json()
+                // Fetch product
+                const prodRes = await fetch(`/api/admin/products/${id}`)
+                if (prodRes.ok) {
+                    const product = await prodRes.json()
                     setFormData({
                         name: product.name || "",
                         slug: product.slug || "",
@@ -63,14 +63,21 @@ export default function EditProductPage() {
                     })
                     setImages(product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []))
                 }
+
+                // Fetch categories
+                const catRes = await fetch("/api/categories")
+                if (catRes.ok) {
+                    const cats = await catRes.json()
+                    setCategories(cats.map((c: any) => c.name))
+                }
             } catch (error) {
-                console.error("Failed to fetch product", error)
+                console.error("Failed to fetch data", error)
             } finally {
                 setLoading(false)
             }
         }
         if (id) {
-            fetchProduct()
+            fetchData()
         }
     }, [id])
 
@@ -114,8 +121,25 @@ export default function EditProductPage() {
             isFeatured: formData.isFeatured,
         }
 
-        await updateProduct(id as string, product)
-        router.push('/admin/products')
+        try {
+            const res = await fetch(`/api/admin/products/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(product)
+            })
+
+            if (res.ok) {
+                router.push('/admin/products')
+            } else {
+                const error = await res.json()
+                alert(`Failed to update product: ${error.error || 'Unknown error'}`)
+            }
+        } catch (error) {
+            console.error("Failed to update product", error)
+            alert("Failed to update product")
+        }
     }
 
     if (loading) return <div className="p-8">Loading product...</div>
@@ -275,9 +299,9 @@ export default function EditProductPage() {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                                 >
                                     <option value="">Select category</option>
-                                    {store.categories.map((cat) => (
-                                        <option key={cat.name} value={cat.name}>
-                                            {cat.name}
+                                    {categories.map((cat) => (
+                                        <option key={cat} value={cat}>
+                                            {cat}
                                         </option>
                                     ))}
                                 </select>
