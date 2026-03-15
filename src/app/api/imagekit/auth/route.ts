@@ -1,16 +1,28 @@
 import { NextRequest, NextResponse } from "next/server"
 import ImageKit from "imagekit"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/src/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth"
 
 export const runtime = "nodejs"
 
-// Initialize ImageKit - private key stays server-side only
-const imagekit = new ImageKit({
-    publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || "",
-    privateKey: process.env.IMAGEKIT_PRIVATE_KEY || "",
-    urlEndpoint: process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || "",
-})
+// Initialize ImageKit only if credentials are provided
+let imagekit: ImageKit | null = null;
+
+try {
+    const publicKey = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY;
+    const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
+    const urlEndpoint = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT;
+
+    if (publicKey && privateKey && urlEndpoint) {
+        imagekit = new ImageKit({
+            publicKey,
+            privateKey,
+            urlEndpoint,
+        });
+    }
+} catch (error) {
+    console.warn("ImageKit initialization skipped - credentials not configured");
+}
 
 /**
  * ImageKit Authentication Endpoint
@@ -23,6 +35,14 @@ const imagekit = new ImageKit({
  */
 export async function GET(req: NextRequest) {
     try {
+        // Check if ImageKit is configured
+        if (!imagekit) {
+            return NextResponse.json(
+                { error: "ImageKit not configured - please set environment variables" },
+                { status: 503 }
+            )
+        }
+
         // 1. Verify admin session
         const session = await getServerSession(authOptions)
 
