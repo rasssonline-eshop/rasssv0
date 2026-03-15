@@ -48,12 +48,27 @@ model User {
   role          String    @default("customer") // customer, seller, admin
   sellerStatus  String?   // pending, approved, rejected
   phone         String?
+  
+  // OTP Verification Fields
+  otp           String?   // Current OTP code
+  otpExpiry     DateTime? // OTP expiration timestamp
+  otpAttempts   Int       @default(0) // Number of failed attempts
+  
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  // Payment Details (for sellers)
+  jazzCashNumber    String?
+  easyPaisaNumber   String?
+  bankName          String?
+  bankAccountTitle  String?
+  bankAccountNumber String?
+  bankIBAN          String?
 
   accounts Account[]
   sessions Session[]
   orders   Order[]
+  products Product[]
 }
 
 model VerificationToken {
@@ -86,8 +101,26 @@ model Product {
   metaTitle         String?
   metaDescription   String?
   rating            Float?   @default(4.3)
+  ownerId           String   @db.ObjectId
+  owner             User     @relation(fields: [ownerId], references: [id])
+  variants          ProductVariant[]
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+model ProductVariant {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId   String   @db.ObjectId
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name        String   // e.g., "Size: Large, Color: Red"
+  sku         String?
+  price       Float?   // If null, uses parent product price
+  stock       Int      @default(0)
+  attributes  Json     // {size: "Large", color: "Red", etc}
+  image       String?  // Optional variant-specific image
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Order {
@@ -99,7 +132,7 @@ model Order {
   paymentMethod   String   @default("cod") // cod, jazzcash, easypaisa, card
   paymentStatus   String   @default("unpaid") // unpaid, paid, refunded
   transactionId   String?
-  items           Json     // Array of {productId, name, qty, price}
+  items           Json     // Array of {productId, name, qty, price, sellerId}
   shippingAddress Json?    // {name, phone, address, city, postalCode}
   customerName    String?
   customerEmail   String?
@@ -110,6 +143,31 @@ model Order {
   updatedAt       DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id])
+}
+
+model Payout {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  sellerId        String   @db.ObjectId
+  orderIds        String[] // Array of order IDs included in this payout
+  totalRevenue    Float    // Total revenue from seller's products
+  commissionRate  Float    // Commission percentage (e.g., 10 for 10%)
+  commissionAmount Float   // Calculated commission amount
+  payoutAmount    Float    // Amount to be paid to seller (revenue - commission)
+  status          String   @default("pending") // pending, processing, completed, failed
+  paymentMethod   String?  // jazzcash, easypaisa, bank_transfer
+  paymentDetails  Json?    // Payment account details used
+  transactionId   String?  // Transaction reference
+  note            String?  // Admin notes
+  paidAt          DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model CommissionSettings {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  defaultRate     Float    @default(10) // Default commission rate (10%)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Category {
