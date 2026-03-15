@@ -88,8 +88,8 @@
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Inter', system-ui, sans-serif;
-  --font-mono: 'Geist Mono', monospace;
+  --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
 
   /* Inherit all root variables */
   --color-background: var(--background);

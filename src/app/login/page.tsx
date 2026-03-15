@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { OTPVerification } from "@/components/auth/OTPVerification"
 import { useI18n } from "@/components/I18nProvider"
 import { toast } from "sonner"
 
@@ -17,6 +18,8 @@ function LoginForm() {
     const { t } = useI18n()
     const [activeTab, setActiveTab] = useState<"login" | "register">("login")
     const [loading, setLoading] = useState(false)
+    const [showOTPVerification, setShowOTPVerification] = useState(false)
+    const [registeredEmail, setRegisteredEmail] = useState("")
 
     // Login state
     const [loginEmail, setLoginEmail] = useState("")
@@ -26,18 +29,25 @@ function LoginForm() {
     const [registerName, setRegisterName] = useState("")
     const [registerEmail, setRegisterEmail] = useState("")
     const [registerPassword, setRegisterPassword] = useState("")
+    const [registerConfirmPassword, setRegisterConfirmPassword] = useState("")
     const [registerRole, setRegisterRole] = useState<"customer" | "seller">("customer")
 
     // Handle URL parameters
     useEffect(() => {
+        if (!searchParams) return
+        
         const tab = searchParams.get("tab")
         const role = searchParams.get("role")
+        const message = searchParams.get("message")
 
         if (tab === "register") {
             setActiveTab("register")
         }
         if (role === "seller") {
             setRegisterRole("seller")
+        }
+        if (message === "seller-registered") {
+            toast.success("Seller registration successful! Please login to continue. Your account is pending admin approval.")
         }
     }, [searchParams])
 
@@ -53,33 +63,66 @@ function LoginForm() {
             })
 
             if (result?.error) {
-                toast.error("Invalid email or password")
-            } else {
-                // Check user role and redirect accordingly
-                const response = await fetch('/api/auth/session')
-                const session = await response.json()
-
-                if (session?.user?.role === 'admin') {
-                    toast.info("Redirecting to admin panel...")
-                    router.push("/admin")
-                } else if (session?.user?.role === 'seller') {
-                    toast.success("Login successful!")
-                    router.push("/profile/seller")
+                // Check if error is due to unverified email
+                if (result.error.includes('EMAIL_NOT_VERIFIED')) {
+                    toast.error("Please verify your email before logging in", {
+                        action: {
+                            label: "Resend OTP",
+                            onClick: async () => {
+                                try {
+                                    const response = await fetch('/api/auth/resend-otp', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ email: loginEmail }),
+                                    })
+                                    const data = await response.json()
+                                    if (response.ok) {
+                                        toast.success("OTP sent to your email")
+                                    } else {
+                                        toast.error(data.message || "Failed to send OTP")
+                                    }
+                                } catch (error) {
+                                    toast.error("Failed to send OTP")
+                                }
+                            }
+                        }
+                    })
                 } else {
-                    toast.success("Login successful!")
-                    router.push("/")
+                    toast.error("Invalid email or password")
                 }
-                router.refresh()
+                setLoading(false)
+                return
+            }
+
+            toast.success("Login successful!")
+            
+            // Fetch the session to get user role
+            const sessionResponse = await fetch('/api/auth/session')
+            const sessionData = await sessionResponse.json()
+            
+            // Redirect based on role
+            if (sessionData?.user?.role === 'admin') {
+                window.location.href = "/admin"
+            } else if (sessionData?.user?.role === 'seller') {
+                window.location.href = "/seller"
+            } else {
+                window.location.href = "/"
             }
         } catch (error) {
             toast.error("Login failed")
-        } finally {
             setLoading(false)
         }
     }
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault()
+        
+        // Validate password match
+        if (registerPassword !== registerConfirmPassword) {
+            toast.error("Passwords do not match")
+            return
+        }
+        
         setLoading(true)
 
         try {
@@ -101,14 +144,40 @@ function LoginForm() {
                 return
             }
 
-            toast.success("Registration successful! Please login.")
-            setActiveTab("login")
-            setLoginEmail(registerEmail)
+            // Show OTP verification screen
+            setRegisteredEmail(registerEmail)
+            setShowOTPVerification(true)
+            toast.success("Registration successful! Please verify your email.")
         } catch (error) {
             toast.error("Registration failed")
         } finally {
             setLoading(false)
         }
+    }
+
+    const handleOTPVerified = () => {
+        toast.success("Email verified! You can now login.")
+        setShowOTPVerification(false)
+        setActiveTab("login")
+        setLoginEmail(registeredEmail)
+        setRegisteredEmail("")
+    }
+
+    const handleBackToRegistration = () => {
+        setShowOTPVerification(false)
+        setRegisteredEmail("")
+    }
+
+    if (showOTPVerification) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+                <OTPVerification
+                    email={registeredEmail}
+                    onVerified={handleOTPVerified}
+                    onBack={handleBackToRegistration}
+                />
+            </div>
+        )
     }
 
     return (
@@ -164,7 +233,7 @@ function LoginForm() {
                                     <Input
                                         id="register-name"
                                         type="text"
-                                        placeholder="John Doe"
+                                        placeholder="Full Name"
                                         value={registerName}
                                         onChange={(e) => setRegisterName(e.target.value)}
                                         required
@@ -192,6 +261,19 @@ function LoginForm() {
                                         required
                                         minLength={6}
                                     />
+                                    <p className="text-xs text-gray-500">Minimum 6 characters</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="register-confirm-password">Confirm Password</Label>
+                                    <Input
+                                        id="register-confirm-password"
+                                        type="password"
+                                        placeholder="••••••••"
+                                        value={registerConfirmPassword}
+                                        onChange={(e) => setRegisterConfirmPassword(e.target.value)}
+                                        required
+                                        minLength={6}
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Account Type</Label>
@@ -205,15 +287,20 @@ function LoginForm() {
                                             />
                                             <span>Customer</span>
                                         </label>
-                                        <div className="flex items-center gap-2 text-gray-400">
+                                        <button
+                                            type="button"
+                                            onClick={() => router.push('/seller/register')}
+                                            className="flex items-center gap-2 text-primary hover:underline"
+                                        >
                                             <input
                                                 type="radio"
-                                                disabled
+                                                readOnly
+                                                className="pointer-events-none"
                                             />
                                             <span>Seller</span>
-                                            <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Coming Soon</span>
-                                        </div>
+                                        </button>
                                     </div>
+                                    <p className="text-xs text-gray-500">Want to sell? Click Seller to register as a seller</p>
                                 </div>
                                 <Button type="submit" className="w-full" disabled={loading}>
                                     {loading ? "Creating account..." : "Create Account"}

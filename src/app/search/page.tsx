@@ -11,10 +11,12 @@ import * as React from "react"
 import { Suspense } from "react"
 import { useCart } from "@/components/CartProvider"
 import { Badge } from "@/components/ui/badge"
+import Header from "@/components/Header"
+import Footer from "@/components/Footer"
 
 function SearchResults() {
     const searchParams = useSearchParams()
-    const query = searchParams.get("q") || ""
+    const query = searchParams?.get("q") || ""
     const { addItem } = useCart()
 
     const [products, setProducts] = React.useState<any[]>([])
@@ -125,8 +127,12 @@ function SearchResults() {
 
 export default function SearchPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen container py-8">Loading...</div>}>
-            <SearchResults />
-        </Suspense>
+        <>
+            <Header />
+            <Suspense fallback={<div className="min-h-screen container py-8">Loading...</div>}>
+                <SearchResults />
+            </Suspense>
+            <Footer />
+        </>
     )
 }

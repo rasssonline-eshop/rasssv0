@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -15,8 +16,13 @@ export default function SellerProfilePage() {
     const { user, logout, isAuthenticated } = useAuth()
     const { t } = useI18n()
 
+    useEffect(() => {
+        if (!isAuthenticated || user?.role !== "seller") {
+            router.push("/login")
+        }
+    }, [isAuthenticated, user, router])
+
     if (!isAuthenticated || user?.role !== "seller") {
-        router.push("/login")
         return null
     }
 

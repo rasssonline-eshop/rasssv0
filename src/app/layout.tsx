@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import MobileNav from '@/components/MobileNav'
@@ -12,8 +12,11 @@ import AuthProvider from '@/components/AuthProvider'
 import AuthSessionProvider from '@/components/AuthSessionProvider'
 import { Toaster } from '@/components/ui/sonner'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://rasss.com'),
@@ -51,7 +54,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`font-sans antialiased`}>
+      <body className={`${inter.variable} font-sans antialiased`}>
         <script
           dangerouslySetInnerHTML={{
             __html:

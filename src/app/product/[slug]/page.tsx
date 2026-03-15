@@ -6,14 +6,28 @@ import * as React from "react"
 import { useParams } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Star, Phone, ShieldCheck, Thermometer, CreditCard, Truck, CheckCircle, ShoppingCart } from "lucide-react"
+import { Star, Phone, ShieldCheck, Thermometer, Truck, CheckCircle, ShoppingCart } from "lucide-react"
 import { formatPKR } from "@/lib/utils"
 import { useCart } from "@/components/CartProvider"
 import { useLocation } from "@/components/LocationProvider"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { useI18n } from "@/components/I18nProvider"
+import Header from "@/components/Header"
+import Footer from "@/components/Footer"
+
+type ProductVariant = {
+  id: string
+  name: string
+  sku?: string
+  price?: number
+  stock: number
+  attributes: Record<string, string>
+  image?: string
+  isDefault: boolean
+}
 
 type Product = {
+  id: string
   slug: string
   name: string
   brand: string
@@ -22,10 +36,23 @@ type Product = {
   rating?: number
   tags?: string[]
   image: string
+  images?: string[]
+  category?: string
+  description?: string
+  stock?: number
+  variants?: ProductVariant[]
+  owner?: {
+    id: string
+    name: string
+    email: string
+    role: string
+    image?: string
+  }
 }
 
 const sampleCatalog: Record<string, Product> = {
   "uriage-depiderm-intensive-care-30ml": {
+    id: "sample-1",
     slug: "uriage-depiderm-intensive-care-30ml",
     name: "URIAGE DEPIDERM INTENSIVE CARE Anti-dark Spot with 3% pure AHA & Vitamin C 30ML",
     brand: "Uriage",
@@ -61,6 +88,7 @@ function getProduct(slug: string): Product {
       for (const list of Object.values(store.productsByCategory || {})) {
         const found = (list as any[]).find(p => p.slug === slug)
         if (found) return {
+          id: found.id || slug,
           slug: found.slug || slug,
           name: found.name,
           brand: found.brand || 'Rasss',
@@ -118,6 +146,7 @@ function getProduct(slug: string): Product {
     'slimming-tea': '/personal-care.jpg',
   }
   return {
+    id: slug,
     slug,
     name: slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
     brand: "Rasss",
@@ -135,7 +164,76 @@ export default function ProductDetailPage() {
   const slug = (() => {
     try { return decodeURIComponent(slugRaw) } catch { return slugRaw }
   })()
-  const product = getProduct(slug)
+  
+  // All hooks must be called before any conditional returns
+  const [product, setProduct] = React.useState<Product | null>(null)
+  const [loading, setLoading] = React.useState(true)
+  const [active, setActive] = React.useState(0)
+  const [selectedVariant, setSelectedVariant] = React.useState<ProductVariant | null>(null)
+  const { addItem, setOpen } = useCart()
+  const { city } = useLocation()
+  const { t } = useI18n()
+
+  // Set default variant when product loads
+  React.useEffect(() => {
+    if (product?.variants && product.variants.length > 0 && !selectedVariant) {
+      const defaultVariant = product.variants.find(v => v.isDefault) || product.variants[0]
+      setSelectedVariant(defaultVariant)
+    }
+  }, [product, selectedVariant])
+
+  // Update main image when variant with image is selected
+  React.useEffect(() => {
+    if (selectedVariant?.image && product) {
+      // Find if variant image exists in images array
+      const variantImageIndex = images.findIndex(img => img === selectedVariant.image)
+      if (variantImageIndex !== -1) {
+        setActive(variantImageIndex)
+      } else {
+        // If variant image not in array, temporarily show it as active image
+        // This will be handled in the images array construction below
+        setActive(0)
+      }
+    }
+  }, [selectedVariant])
+
+  React.useEffect(() => {
+    async function fetchProduct() {
+      try {
+        const res = await fetch(`/api/products/${encodeURIComponent(slug)}`)
+        if (res.ok) {
+          const data = await res.json()
+          setProduct(data)
+        } else {
+          // Fallback to local storage or sample data
+          setProduct(getProduct(slug))
+        }
+      } catch (error) {
+        console.error("Failed to fetch product:", error)
+        setProduct(getProduct(slug))
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProduct()
+  }, [slug])
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 md:px-8 py-12 md:py-20">
+        <div className="text-center">Loading product...</div>
+      </div>
+    )
+  }
+
+  if (!product) {
+    return (
+      <div className="container mx-auto px-4 md:px-8 py-12 md:py-20">
+        <div className="text-center">Product not found</div>
+      </div>
+    )
+  }
+
   const comingSoonPrefixes = new Set([
     'acne-cream',
     'acne-scar-cream',
@@ -163,21 +261,30 @@ export default function ProductDetailPage() {
   ])
   const prefix = product.slug.replace(/-product-.*$/, '')
   const isComingSoon = comingSoonPrefixes.has(prefix)
-  const images = [
-    product.image,
-    "https://picsum.photos/seed/product-2/800/800",
-    "https://picsum.photos/seed/product-3/800/800",
-    "https://picsum.photos/seed/product-4/800/800",
-    "https://picsum.photos/seed/product-5/800/800",
-  ]
-  const [active, setActive] = React.useState(0)
-  const { addItem, setOpen } = useCart()
-  const { city } = useLocation()
+  
+  // Build images array - if variant has image, show it first
+  let images = product.images && product.images.length > 0 
+    ? product.images 
+    : [
+        product.image,
+        "https://picsum.photos/seed/product-2/800/800",
+        "https://picsum.photos/seed/product-3/800/800",
+        "https://picsum.photos/seed/product-4/800/800",
+        "https://picsum.photos/seed/product-5/800/800",
+      ]
+  
+  // If selected variant has an image, add it to the beginning of images array
+  if (selectedVariant?.image) {
+    images = [selectedVariant.image, ...images.filter(img => img !== selectedVariant.image)]
+  }
+  
   const sameDay = city.toLowerCase() === 'lahore'
-  const { t } = useI18n()
+  const hasOwner = product.owner && product.owner.id
 
   return (
-    <div className="container mx-auto px-4 md:px-8 py-12 md:py-20 animate-fade-in-up">
+    <>
+      <Header />
+      <div className="container mx-auto px-4 md:px-8 py-12 md:py-20 animate-fade-in-up">
       <Breadcrumb className="mb-8">
         <BreadcrumbList className="text-muted-foreground">
           <BreadcrumbItem>
@@ -259,15 +366,123 @@ export default function ProductDetailPage() {
                 <span className="font-semibold text-gray-900">{product.brand}</span>
               </div>
             </div>
+
+            {hasOwner && product.owner && (
+              <Link href={`/store/${product.owner.id}`}>
+                <div className="flex items-center gap-3 p-4 bg-white border-2 border-gray-200 rounded-xl hover:border-primary hover:shadow-md transition-all cursor-pointer group">
+                  {product.owner.image ? (
+                    <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 ring-2 ring-gray-100">
+                      <Image 
+                        src={product.owner.image} 
+                        alt={product.owner.name || 'Store'} 
+                        width={56} 
+                        height={56}
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shrink-0 ring-2 ring-gray-100">
+                      {(product.owner.name || 'S')[0].toUpperCase()}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs text-gray-500 font-medium mb-0.5">
+                      {product.owner.role === 'seller' ? 'Sold by' : 'By'}
+                    </div>
+                    <div className="font-bold text-gray-900 group-hover:text-primary transition-colors truncate">
+                      {product.owner.name || 'Store'}
+                    </div>
+                    <div className="text-xs text-primary font-medium mt-0.5 flex items-center gap-1">
+                      Visit Store 
+                      <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
+                  {product.owner.role === 'seller' && (
+                    <Badge className="bg-green-100 text-green-800 border-0 shrink-0">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Verified
+                    </Badge>
+                  )}
+                </div>
+              </Link>
+            )}
           </div>
+
+          {/* Product Variants Selector */}
+          {product.variants && product.variants.length > 0 && (
+            <div className="space-y-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
+              <h3 className="font-semibold text-gray-900">Select Variant</h3>
+              <div className="grid grid-cols-1 gap-2">
+                {product.variants.map((variant) => {
+                  const isSelected = selectedVariant?.id === variant.id
+                  const isOutOfStock = variant.stock === 0
+                  
+                  return (
+                    <button
+                      key={variant.id}
+                      onClick={() => !isOutOfStock && setSelectedVariant(variant)}
+                      disabled={isOutOfStock}
+                      className={`
+                        p-3 rounded-lg border-2 text-left transition-all
+                        ${isSelected 
+                          ? 'border-primary bg-primary/5 shadow-sm' 
+                          : 'border-gray-200 bg-white hover:border-primary/50'
+                        }
+                        ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                      `}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        {variant.image && (
+                          <div className="relative w-12 h-12 rounded-md overflow-hidden border border-gray-200 shrink-0">
+                            <Image
+                              src={variant.image}
+                              alt={variant.name}
+                              fill
+                              className="object-cover"
+                              sizes="48px"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-900">{variant.name}</div>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {Object.entries(variant.attributes).map(([key, value]) => (
+                              <span key={key} className="text-xs text-gray-600 bg-white px-2 py-0.5 rounded-md border border-gray-200">
+                                {key}: {value}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="text-right ml-3">
+                          {variant.price && (
+                            <div className="font-bold text-primary">{formatPKR(variant.price)}</div>
+                          )}
+                          <div className={`text-xs ${isOutOfStock ? 'text-red-600' : 'text-green-600'}`}>
+                            {isOutOfStock ? 'Out of Stock' : `${variant.stock} in stock`}
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           <div className="flex items-end gap-3 pb-6 border-b border-gray-100">
             <span className="text-4xl font-extrabold text-primary tracking-tight">
-              {formatPKR(product.price)}
+              {formatPKR(selectedVariant?.price || product.price)}
             </span>
             {product.oldPrice && (
               <span className="text-xl text-gray-400 line-through mb-1">
                 {formatPKR(product.oldPrice)}
+              </span>
+            )}
+            {selectedVariant && (
+              <span className="text-sm text-gray-600 mb-2">
+                ({selectedVariant.name})
               </span>
             )}
           </div>
@@ -277,12 +492,25 @@ export default function ProductDetailPage() {
               size="lg"
               className="w-full h-14 text-lg bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all rounded-xl font-semibold gap-2"
               onClick={() => {
-                addItem({ id: product.slug, slug: product.slug, name: product.name, price: product.price, image: images[active] }, 1);
+                const variantToAdd = selectedVariant || (product.variants && product.variants.length > 0 ? product.variants.find(v => v.isDefault) || product.variants[0] : null)
+                const priceToUse = variantToAdd?.price || product.price
+                const imageToUse = variantToAdd?.image || images[active]
+                
+                addItem({ 
+                  id: product.slug, 
+                  slug: product.slug, 
+                  name: product.name, 
+                  price: priceToUse, 
+                  image: imageToUse,
+                  variantId: variantToAdd?.id,
+                  variantName: variantToAdd?.name
+                }, 1);
                 setOpen(true);
               }}
+              disabled={selectedVariant ? selectedVariant.stock === 0 : (product.stock === 0)}
             >
               <ShoppingCart className="w-5 h-5" />
-              {t("button.addToCart")}
+              {selectedVariant && selectedVariant.stock === 0 ? 'Out of Stock' : t("button.addToCart")}
             </Button>
 
             <Button
@@ -364,5 +592,7 @@ export default function ProductDetailPage() {
         </div>
       </div>
     </div>
+    <Footer />
+    </>
   )
 }

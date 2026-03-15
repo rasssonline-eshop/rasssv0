@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Star, ShoppingCart } from "lucide-react"
+import { Star, ShoppingCart, RefreshCw } from "lucide-react"
 import { useParams } from "next/navigation"
 import Image from "next/image"
 import { formatPKR } from "@/lib/utils"
@@ -12,6 +12,8 @@ import * as React from "react"
 import { useCart } from "@/components/CartProvider"
 import { Badge } from "@/components/ui/badge"
 import { useI18n } from "@/components/I18nProvider"
+import Header from "@/components/Header"
+import Footer from "@/components/Footer"
 
 const categoryImages: Record<string, string> = {
   Fragrances: "https://picsum.photos/seed/fragrances/600/600",
@@ -77,27 +79,51 @@ export default function CategoryPage() {
 
   const [apiProducts, setApiProducts] = React.useState<any[]>([])
   const [loading, setLoading] = React.useState(true)
+  const [refreshKey, setRefreshKey] = React.useState(0)
 
   const brands = ["Uriage", "Vichy", "Avene", "Bioderma", "Cerave"]
   const rngBase = seededRng(strHash(name))
 
-  React.useEffect(() => {
-    async function fetchProducts() {
-      setLoading(true)
-      try {
-        const res = await fetch(`/api/products?category=${encodeURIComponent(name)}&limit=100`)
-        if (res.ok) {
-          const data = await res.json()
-          setApiProducts(data)
-        }
-      } catch (e) {
-        console.error("Failed to fetch products", e)
-      } finally {
-        setLoading(false)
+  const fetchProducts = React.useCallback(async () => {
+    setLoading(true)
+    try {
+      // Add timestamp to prevent caching
+      const url = `/api/products?category=${encodeURIComponent(name)}&limit=100&t=${Date.now()}`
+      console.log('Fetching products for category:', name)
+      console.log('API URL:', url)
+      
+      const res = await fetch(url, {
+        cache: 'no-store'
+      })
+      
+      console.log('API Response status:', res.status)
+      
+      if (res.ok) {
+        const data = await res.json()
+        console.log('Products received:', data.length)
+        console.log('Products:', data)
+        setApiProducts(data)
+      } else {
+        console.error('API error:', res.status, await res.text())
       }
+    } catch (e) {
+      console.error("Failed to fetch products", e)
+    } finally {
+      setLoading(false)
     }
-    fetchProducts()
   }, [name])
+
+  React.useEffect(() => {
+    fetchProducts()
+  }, [name, refreshKey, fetchProducts])
+
+  // Auto-refresh every 30 seconds to show new products
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setRefreshKey(prev => prev + 1)
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   // Map API products to view model
   const products = apiProducts.map((p, i) => ({
@@ -112,13 +138,15 @@ export default function CategoryPage() {
   }))
 
   const [sort, setSort] = React.useState<'relevance' | 'priceAsc' | 'priceDesc' | 'ratingDesc'>('relevance')
-  const [minPrice, setMinPrice] = React.useState(0)
-  const [maxPrice, setMaxPrice] = React.useState(1000)
+  const [minPrice, setMinPrice] = React.useState<number | ''>('')
+  const [maxPrice, setMaxPrice] = React.useState<number | ''>('')
   const [selectedBrand, setSelectedBrand] = React.useState<string>('All')
 
-  const filtered = products.filter(
-    (p) => p.price >= minPrice && p.price <= maxPrice && (selectedBrand === 'All' || p.brand === selectedBrand)
-  )
+  const filtered = products.filter((p) => {
+    const minPriceNum = minPrice === '' ? 0 : minPrice
+    const maxPriceNum = maxPrice === '' ? Infinity : maxPrice
+    return p.price >= minPriceNum && p.price <= maxPriceNum && (selectedBrand === 'All' || p.brand === selectedBrand)
+  })
   const sorted = [...filtered].sort((a, b) => {
     switch (sort) {
       case 'priceAsc':
@@ -133,9 +161,23 @@ export default function CategoryPage() {
   })
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <>
+      <Header />
+      <div className="min-h-screen bg-gray-50 py-8">
       <div className="container">
-        <h1 className="text-3xl font-bold mb-2">{name}</h1>
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-3xl font-bold">{name}</h1>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setRefreshKey(prev => prev + 1)}
+            disabled={loading}
+            className="gap-2"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? 'Loading...' : 'Refresh'}
+          </Button>
+        </div>
         <p className="text-gray-600 mb-4">{t("category.showing")} {sorted.length} {t("common.products")}</p>
         <div className="flex flex-wrap items-center gap-3 mb-8 rounded-lg border bg-white p-3">
           <label className="text-sm text-gray-600">{t("sort.sort")}</label>
@@ -153,9 +195,21 @@ export default function CategoryPage() {
             ))}
           </select>
           <label className="ml-4 text-sm text-gray-600">{t("filter.price")}</label>
-          <Input type="number" value={minPrice} onChange={(e) => setMinPrice(Number(e.target.value))} className="w-24 bg-white" />
+          <Input 
+            type="number" 
+            value={minPrice} 
+            onChange={(e) => setMinPrice(e.target.value === '' ? '' : Number(e.target.value))} 
+            placeholder="Min"
+            className="w-24 bg-white" 
+          />
           <span className="text-sm text-gray-500">{t("filter.to")}</span>
-          <Input type="number" value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} className="w-24 bg-white" />
+          <Input 
+            type="number" 
+            value={maxPrice} 
+            onChange={(e) => setMaxPrice(e.target.value === '' ? '' : Number(e.target.value))} 
+            placeholder="Max"
+            className="w-24 bg-white" 
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -216,5 +270,7 @@ export default function CategoryPage() {
         </div>
       </div>
     </div>
+    <Footer />
+    </>
   )
 }
